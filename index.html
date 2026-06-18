@@ -154,9 +154,15 @@
       font-weight: 600;
     }
 
+    .link-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+    }
+
     .hidden { display: none; }
 
-    /* Wrong-answer popup */
     .popup-overlay {
       position: fixed;
       inset: 0;
@@ -187,7 +193,7 @@
 
     @keyframes popIn {
       from { transform: scale(0.85); opacity: 0; }
-      to   { transform: scale(1);    opacity: 1; }
+      to   { transform: scale(1); opacity: 1; }
     }
 
     .popup-icon {
@@ -252,13 +258,12 @@
 
     <div class="status" id="statusText">Choose an answer.</div>
 
-   <div class="controls">
-  <button class="control-btn" id="restartBtn">Restart</button>
-  <a href="russian-fates.html" class="control-btn link-btn">Russian Fates Trivia</a>
-</div>
+    <div class="controls">
+      <button class="control-btn" id="restartBtn">Restart</button>
+      <a href="russian-fates.html" class="control-btn link-btn">Russian Fates Trivia</a>
+    </div>
   </main>
 
-  <!-- Wrong-answer popup -->
   <div class="popup-overlay hidden" id="popupOverlay" role="dialog" aria-modal="true" aria-labelledby="popupTitle">
     <div class="popup-card">
       <div class="popup-icon">&#10060;</div>
@@ -270,7 +275,6 @@
 
   <script>
     const countries = [
-      // British colonies
       { name: 'India', flag: 'https://flagcdn.com/w640/in.png', answer: 'British' },
       { name: 'Nigeria', flag: 'https://flagcdn.com/w640/ng.png', answer: 'British' },
       { name: 'Kenya', flag: 'https://flagcdn.com/w640/ke.png', answer: 'British' },
@@ -303,7 +307,6 @@
       { name: 'Australia', flag: 'https://flagcdn.com/w640/au.png', answer: 'British' },
       { name: 'New Zealand', flag: 'https://flagcdn.com/w640/nz.png', answer: 'British' },
       { name: 'Canada', flag: 'https://flagcdn.com/w640/ca.png', answer: 'British' },
-      // French colonies
       { name: 'Senegal', flag: 'https://flagcdn.com/w640/sn.png', answer: 'French' },
       { name: 'Algeria', flag: 'https://flagcdn.com/w640/dz.png', answer: 'French' },
       { name: 'Mali', flag: 'https://flagcdn.com/w640/ml.png', answer: 'French' },
@@ -365,7 +368,6 @@
     function renderQuestion() {
       if (state.index >= state.deck.length) {
         let newDeck = shuffle(countries);
-        // Prevent the first card of the new cycle from being the same country just shown
         if (state.lastShownName && newDeck.length > 1 && newDeck[0].name === state.lastShownName) {
           const swapIdx = 1 + Math.floor(Math.random() * (newDeck.length - 1));
           [newDeck[0], newDeck[swapIdx]] = [newDeck[swapIdx], newDeck[0]];
