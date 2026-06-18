@@ -40,8 +40,9 @@
       padding: var(--space-4);
     }
 
-    button, img { display: block; }
-    button { font: inherit; cursor: pointer; border: none; }
+    button, img, input { display: block; }
+    button, input { font: inherit; }
+    button { cursor: pointer; border: none; }
 
     .app-shell {
       position: relative;
@@ -178,6 +179,7 @@
       gap: var(--space-3);
       justify-content: center;
       flex-wrap: wrap;
+      margin-bottom: var(--space-6);
     }
 
     .control-btn {
@@ -190,9 +192,106 @@
       font-weight: 600;
     }
 
+    .hall-of-fame {
+      width: min(100%, 420px);
+      margin: 0 auto;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 1rem;
+      padding: var(--space-4);
+      box-shadow: 0 10px 26px rgba(10, 15, 35, 0.12);
+    }
+
+    .hall-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+      margin-bottom: var(--space-4);
+    }
+
+    .hall-title {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .hall-note {
+      font-size: 0.8rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .hall-list {
+      display: grid;
+      gap: var(--space-2);
+    }
+
+    .hall-empty {
+      text-align: center;
+      color: var(--muted);
+      font-size: var(--text-sm);
+      padding: var(--space-4) var(--space-2);
+    }
+
+    .hall-row {
+      display: grid;
+      grid-template-columns: 34px 1fr auto;
+      align-items: center;
+      gap: var(--space-3);
+      min-height: 48px;
+      padding: 0.7rem 0.85rem;
+      border-radius: 0.85rem;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .hall-row.top-1 {
+      background: rgba(255, 214, 102, 0.16);
+      border-color: rgba(255, 214, 102, 0.24);
+    }
+
+    .hall-row.top-2 {
+      background: rgba(220, 226, 235, 0.12);
+      border-color: rgba(220, 226, 235, 0.2);
+    }
+
+    .hall-row.top-3 {
+      background: rgba(205, 127, 80, 0.14);
+      border-color: rgba(205, 127, 80, 0.22);
+    }
+
+    .hall-rank {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.14);
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.96);
+    }
+
+    .hall-name {
+      min-width: 0;
+      font-size: 0.96rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .hall-score {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.96);
+    }
+
     .hidden { display: none; }
 
-    .popup-overlay {
+    .popup-overlay,
+    .name-overlay {
       position: fixed;
       inset: 0;
       background: rgba(0, 0, 0, 0.45);
@@ -200,25 +299,37 @@
       place-items: center;
       z-index: 100;
       animation: fadeIn 160ms ease;
+      padding: var(--space-4);
     }
 
-    .popup-overlay.hidden { display: none; }
+    .popup-overlay.hidden,
+    .name-overlay.hidden { display: none; }
 
     @keyframes fadeIn {
       from { opacity: 0; }
       to   { opacity: 1; }
     }
 
+    .popup-card,
+    .name-card {
+      border-radius: var(--radius);
+      max-width: min(92vw, 420px);
+      text-align: center;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      animation: popIn 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
     .popup-card {
       background: rgba(180, 20, 40, 0.92);
       border: 1px solid rgba(255, 120, 120, 0.4);
-      backdrop-filter: blur(14px);
-      border-radius: var(--radius);
       padding: clamp(var(--space-5), 5vw, var(--space-8));
-      max-width: min(92vw, 380px);
-      text-align: center;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-      animation: popIn 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .name-card {
+      background: rgba(38, 45, 92, 0.92);
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: clamp(var(--space-5), 5vw, var(--space-8));
     }
 
     @keyframes popIn {
@@ -231,33 +342,81 @@
       margin-bottom: var(--space-3);
     }
 
-    .popup-title {
+    .popup-title,
+    .name-title {
       font-size: var(--text-lg);
       font-weight: 700;
       margin-bottom: var(--space-3);
     }
 
-    .popup-body {
+    .popup-body,
+    .name-body {
       font-size: var(--text-sm);
       color: rgba(255,255,255,0.88);
       line-height: 1.5;
       margin-bottom: var(--space-5);
     }
 
-    .popup-btn {
+    .popup-btn,
+    .name-btn,
+    .name-skip-btn {
       min-height: 44px;
       padding: 0 var(--space-6);
       border-radius: 999px;
-      background: rgba(255,255,255,0.22);
       color: var(--text);
-      border: 1px solid rgba(255,255,255,0.35);
       font-weight: 600;
-      font: inherit;
-      cursor: pointer;
-      transition: background 150ms ease;
+      border: 1px solid rgba(255,255,255,0.26);
     }
 
-    .popup-btn:hover { background: rgba(255,255,255,0.32); }
+    .popup-btn,
+    .name-btn {
+      background: rgba(255,255,255,0.22);
+    }
+
+    .popup-btn:hover,
+    .name-btn:hover {
+      background: rgba(255,255,255,0.32);
+    }
+
+    .name-form {
+      display: grid;
+      gap: var(--space-3);
+    }
+
+    .name-input {
+      width: 100%;
+      min-height: 48px;
+      border-radius: 0.9rem;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.12);
+      color: var(--text);
+      padding: 0 1rem;
+      outline: none;
+    }
+
+    .name-input::placeholder {
+      color: rgba(255,255,255,0.62);
+    }
+
+    .name-input:focus {
+      border-color: rgba(255,255,255,0.45);
+      background: rgba(255,255,255,0.18);
+    }
+
+    .name-actions {
+      display: flex;
+      gap: var(--space-3);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .name-skip-btn {
+      background: rgba(255,255,255,0.1);
+    }
+
+    .name-skip-btn:hover {
+      background: rgba(255,255,255,0.18);
+    }
 
     @media (max-width: 1100px) {
       .app-shell {
@@ -285,8 +444,19 @@
         width: 100%;
       }
 
-      .control-btn {
+      .control-btn,
+      .name-btn,
+      .name-skip-btn {
         width: 100%;
+      }
+
+      .hall-of-fame {
+        width: 100%;
+      }
+
+      .hall-head {
+        flex-direction: column;
+        align-items: flex-start;
       }
     }
   </style>
@@ -320,6 +490,14 @@
       <div class="controls">
         <button class="control-btn" id="restartBtn">Restart</button>
       </div>
+
+      <section class="hall-of-fame" aria-labelledby="hallTitle">
+        <div class="hall-head">
+          <div class="hall-title" id="hallTitle">Hall of Fame</div>
+          <div class="hall-note">Best streaks</div>
+        </div>
+        <div class="hall-list" id="leaderboardList"></div>
+      </section>
     </main>
   </div>
 
@@ -329,6 +507,28 @@
       <div class="popup-title" id="popupTitle">Wrong!</div>
       <div class="popup-body" id="popupBody"></div>
       <button class="popup-btn" id="popupOkBtn">Continue</button>
+    </div>
+  </div>
+
+  <div class="name-overlay hidden" id="nameOverlay" role="dialog" aria-modal="true" aria-labelledby="nameTitle">
+    <div class="name-card">
+      <div class="name-title" id="nameTitle">Save your streak</div>
+      <div class="name-body" id="nameBody">Enter your name to add your score to the leaderboard.</div>
+      <form class="name-form" id="nameForm">
+        <input
+          type="text"
+          id="playerNameInput"
+          class="name-input"
+          maxlength="20"
+          placeholder="Your name"
+          autocomplete="name"
+          required
+        />
+        <div class="name-actions">
+          <button type="submit" class="name-btn">Save score</button>
+          <button type="button" class="name-skip-btn" id="skipSaveBtn">Skip</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -396,7 +596,19 @@
       { name: 'French Guiana', flag: 'https://flagcdn.com/w640/gf.png', answer: 'French' }
     ];
 
-    const state = { deck: [], index: 0, answered: false, streak: 0, bestStreak: 0, lastShownName: null };
+    const LEADERBOARD_KEY = 'colonial-trivia-leaderboard';
+    const MAX_LEADERBOARD_ENTRIES = 6;
+
+    const state = {
+      deck: [],
+      index: 0,
+      answered: false,
+      streak: 0,
+      bestStreak: 0,
+      lastShownName: null,
+      pendingScore: null
+    };
+
     const countryName = document.getElementById('countryName');
     const countryFlag = document.getElementById('countryFlag');
     const scoreLine = document.getElementById('scoreLine');
@@ -406,6 +618,13 @@
     const popupOverlay = document.getElementById('popupOverlay');
     const popupBody = document.getElementById('popupBody');
     const popupOkBtn = document.getElementById('popupOkBtn');
+
+    const nameOverlay = document.getElementById('nameOverlay');
+    const nameBody = document.getElementById('nameBody');
+    const nameForm = document.getElementById('nameForm');
+    const playerNameInput = document.getElementById('playerNameInput');
+    const skipSaveBtn = document.getElementById('skipSaveBtn');
+    const leaderboardList = document.getElementById('leaderboardList');
 
     function shuffle(list) {
       const copy = [...list];
@@ -422,6 +641,69 @@
 
     function updateScore() {
       scoreLine.textContent = `Streak: ${state.streak} | Best: ${state.bestStreak}`;
+    }
+
+    function getLeaderboard() {
+      try {
+        return JSON.parse(localStorage.getItem(LEADERBOARD_KEY)) || [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function saveLeaderboard(entries) {
+      localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(entries));
+    }
+
+    function escapeHtml(value) {
+      return value
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function renderLeaderboard() {
+      const entries = getLeaderboard();
+
+      if (!entries.length) {
+        leaderboardList.innerHTML = '<div class="hall-empty">No record holders yet. Set the first streak.</div>';
+        return;
+      }
+
+      leaderboardList.innerHTML = entries
+        .map((entry, index) => {
+          const topClass = index === 0 ? 'top-1' : index === 1 ? 'top-2' : index === 2 ? 'top-3' : '';
+          return `
+            <div class="hall-row ${topClass}">
+              <div class="hall-rank">#${index + 1}</div>
+              <div class="hall-name">${escapeHtml(entry.name)}</div>
+              <div class="hall-score">${entry.score}</div>
+            </div>
+          `;
+        })
+        .join('');
+    }
+
+    function addLeaderboardEntry(name, score) {
+      const cleanName = name.trim().slice(0, 20);
+      if (!cleanName || score <= 0) return;
+
+      const entries = getLeaderboard();
+      entries.push({
+        name: cleanName,
+        score,
+        createdAt: Date.now()
+      });
+
+      entries.sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        return a.createdAt - b.createdAt;
+      });
+
+      saveLeaderboard(entries.slice(0, MAX_LEADERBOARD_ENTRIES));
+      renderLeaderboard();
     }
 
     function renderQuestion() {
@@ -442,26 +724,49 @@
       countryFlag.src = item.flag;
       countryFlag.alt = `${item.name} flag`;
       statusText.textContent = 'Choose an answer.';
+
       answerButtons.forEach(btn => {
         btn.disabled = false;
         btn.classList.remove('correct', 'wrong', 'dimmed');
       });
+
       updateScore();
     }
 
     function showWrongPopup(item, endedStreak) {
-      popupBody.textContent = `${item.name} was a ${item.answer} colony. Your streak was: ${endedStreak}.`;
+      popupBody.textContent = `${item.name} was a ${item.answer} colony. Your streak was ${endedStreak}.`;
       popupOverlay.classList.remove('hidden');
       popupOkBtn.focus();
     }
 
-    function dismissPopup() {
+    function dismissWrongPopup() {
       popupOverlay.classList.add('hidden');
+
+      if (state.pendingScore && state.pendingScore > 0) {
+        openNameModal(state.pendingScore);
+      } else {
+        renderQuestion();
+      }
+    }
+
+    function openNameModal(score) {
+      state.pendingScore = score;
+      nameBody.textContent = `Wrong! Your streak was ${score}. Enter your name to claim a place in the Hall of Fame.`;
+      playerNameInput.value = '';
+      nameOverlay.classList.remove('hidden');
+      playerNameInput.focus();
+    }
+
+    function closeNameModal() {
+      nameOverlay.classList.add('hidden');
+      state.pendingScore = null;
+      renderLeaderboard();
       renderQuestion();
     }
 
     function chooseAnswer(choice) {
       if (state.answered) return;
+
       state.answered = true;
       const item = currentCountry();
       const correct = choice === item.answer;
@@ -485,6 +790,7 @@
         const ended = state.streak;
         state.streak = 0;
         updateScore();
+        state.pendingScore = ended;
         showWrongPopup(item, ended);
       }
     }
@@ -496,16 +802,42 @@
       state.streak = 0;
       state.bestStreak = 0;
       state.lastShownName = null;
+      state.pendingScore = null;
+
       popupOverlay.classList.add('hidden');
+      nameOverlay.classList.add('hidden');
+
       updateScore();
       renderQuestion();
     }
 
-    answerButtons.forEach(btn => btn.addEventListener('click', () => chooseAnswer(btn.dataset.choice)));
-    popupOkBtn.addEventListener('click', dismissPopup);
-    popupOverlay.addEventListener('click', e => { if (e.target === popupOverlay) dismissPopup(); });
+    answerButtons.forEach(btn =>
+      btn.addEventListener('click', () => chooseAnswer(btn.dataset.choice))
+    );
+
+    popupOkBtn.addEventListener('click', dismissWrongPopup);
+
+    popupOverlay.addEventListener('click', e => {
+      if (e.target === popupOverlay) dismissWrongPopup();
+    });
+
+    nameForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const name = playerNameInput.value.trim();
+
+      if (!name) {
+        playerNameInput.focus();
+        return;
+      }
+
+      addLeaderboardEntry(name, state.pendingScore || 0);
+      closeNameModal();
+    });
+
+    skipSaveBtn.addEventListener('click', closeNameModal);
     restartBtn.addEventListener('click', restartGame);
 
+    renderLeaderboard();
     restartGame();
   </script>
 </body>
