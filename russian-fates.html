@@ -28,6 +28,7 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { -webkit-text-size-adjust: none; text-size-adjust: none; }
+
     body {
       min-height: 100vh;
       font-family: Arial, sans-serif;
@@ -39,7 +40,7 @@
       padding: var(--space-4);
     }
 
-    button, a { font: inherit; }
+    button, a, input, img { font: inherit; display: block; }
     button { cursor: pointer; border: none; }
     a { color: white; text-decoration: none; }
 
@@ -95,9 +96,27 @@
     .person-box {
       background: rgba(255,255,255,0.1);
       border-radius: 1rem;
-      padding: var(--space-6);
+      padding: var(--space-5);
       margin-bottom: var(--space-5);
       text-align: center;
+    }
+
+    .portrait-frame {
+      width: min(100%, 320px);
+      margin: 0 auto var(--space-5);
+      padding: var(--space-3);
+      border-radius: 1rem;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+    }
+
+    .portrait {
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      object-fit: cover;
+      border-radius: 0.9rem;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.22);
+      background: rgba(255,255,255,0.08);
     }
 
     .person-name {
@@ -150,6 +169,7 @@
       gap: var(--space-3);
       justify-content: center;
       flex-wrap: wrap;
+      margin-bottom: var(--space-6);
     }
 
     .control-btn {
@@ -162,10 +182,235 @@
       font-weight: 600;
     }
 
+    .hall-of-fame {
+      width: min(100%, 420px);
+      margin: 0 auto;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 1rem;
+      padding: var(--space-4);
+      box-shadow: 0 10px 26px rgba(10, 15, 35, 0.12);
+    }
+
+    .hall-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+      margin-bottom: var(--space-4);
+    }
+
+    .hall-title {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .hall-note {
+      font-size: 0.8rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .hall-list {
+      display: grid;
+      gap: var(--space-2);
+    }
+
+    .hall-empty {
+      text-align: center;
+      color: var(--muted);
+      font-size: var(--text-sm);
+      padding: var(--space-4) var(--space-2);
+    }
+
+    .hall-row {
+      display: grid;
+      grid-template-columns: 34px 1fr auto;
+      align-items: center;
+      gap: var(--space-3);
+      min-height: 48px;
+      padding: 0.7rem 0.85rem;
+      border-radius: 0.85rem;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .hall-row.top-1 {
+      background: rgba(255, 214, 102, 0.16);
+      border-color: rgba(255, 214, 102, 0.24);
+    }
+
+    .hall-row.top-2 {
+      background: rgba(220, 226, 235, 0.12);
+      border-color: rgba(220, 226, 235, 0.2);
+    }
+
+    .hall-row.top-3 {
+      background: rgba(205, 127, 80, 0.14);
+      border-color: rgba(205, 127, 80, 0.22);
+    }
+
+    .hall-rank {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.14);
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.96);
+    }
+
+    .hall-name {
+      min-width: 0;
+      font-size: 0.96rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .hall-score {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.96);
+    }
+
+    .popup-overlay,
+    .name-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      display: grid;
+      place-items: center;
+      z-index: 100;
+      animation: fadeIn 160ms ease;
+      padding: var(--space-4);
+    }
+
+    .hidden { display: none !important; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .popup-card,
+    .name-card {
+      border-radius: var(--radius);
+      max-width: min(92vw, 420px);
+      text-align: center;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      animation: popIn 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .popup-card {
+      background: rgba(180, 20, 40, 0.92);
+      border: 1px solid rgba(255, 120, 120, 0.4);
+      padding: clamp(var(--space-5), 5vw, var(--space-8));
+    }
+
+    .name-card {
+      background: rgba(38, 45, 92, 0.92);
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: clamp(var(--space-5), 5vw, var(--space-8));
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.85); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .popup-icon {
+      font-size: 2.2rem;
+      margin-bottom: var(--space-3);
+    }
+
+    .popup-title,
+    .name-title {
+      font-size: var(--text-lg);
+      font-weight: 700;
+      margin-bottom: var(--space-3);
+    }
+
+    .popup-body,
+    .name-body {
+      font-size: var(--text-sm);
+      color: rgba(255,255,255,0.88);
+      line-height: 1.5;
+      margin-bottom: var(--space-5);
+    }
+
+    .popup-btn,
+    .name-btn,
+    .name-skip-btn {
+      min-height: 44px;
+      padding: 0 var(--space-6);
+      border-radius: 999px;
+      color: var(--text);
+      font-weight: 600;
+      border: 1px solid rgba(255,255,255,0.26);
+    }
+
+    .popup-btn,
+    .name-btn {
+      background: rgba(255,255,255,0.22);
+    }
+
+    .popup-btn:hover,
+    .name-btn:hover {
+      background: rgba(255,255,255,0.32);
+    }
+
+    .name-form {
+      display: grid;
+      gap: var(--space-3);
+    }
+
+    .name-input {
+      width: 100%;
+      min-height: 48px;
+      border-radius: 0.9rem;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.12);
+      color: var(--text);
+      padding: 0 1rem;
+      outline: none;
+    }
+
+    .name-input::placeholder {
+      color: rgba(255,255,255,0.62);
+    }
+
+    .name-input:focus {
+      border-color: rgba(255,255,255,0.45);
+      background: rgba(255,255,255,0.18);
+    }
+
+    .name-actions {
+      display: flex;
+      gap: var(--space-3);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .name-skip-btn {
+      background: rgba(255,255,255,0.1);
+    }
+
+    .name-skip-btn:hover {
+      background: rgba(255,255,255,0.18);
+    }
+
     @media (max-width: 700px) {
       .answers { grid-template-columns: 1fr; }
       .top { flex-direction: column; align-items: flex-start; }
-      .control-btn, .nav a, .nav button { width: 100%; }
+      .control-btn, .nav a, .nav button, .name-btn, .name-skip-btn { width: 100%; }
+      .hall-of-fame { width: 100%; }
+      .hall-head { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
@@ -182,6 +427,9 @@
     </div>
 
     <section class="person-box">
+      <div class="portrait-frame">
+        <img id="personImage" class="portrait" src="" alt="Portrait" width="320" height="400" loading="eager" decoding="async" />
+      </div>
       <div class="person-name" id="personName">Name</div>
       <div class="person-role" id="personRole">Writer / Musician / Intellectual</div>
     </section>
@@ -193,29 +441,145 @@
     </section>
 
     <div class="status" id="statusText">Choose an answer.</div>
+
+    <div class="controls">
+      <button class="control-btn" id="restartBtnBottom">Restart</button>
+    </div>
+
+    <section class="hall-of-fame" aria-labelledby="hallTitle">
+      <div class="hall-head">
+        <div class="hall-title" id="hallTitle">Hall of Fame</div>
+        <div class="hall-note">Best streaks</div>
+      </div>
+      <div class="hall-list" id="leaderboardList"></div>
+    </section>
   </main>
+
+  <div class="popup-overlay hidden" id="popupOverlay" role="dialog" aria-modal="true" aria-labelledby="popupTitle">
+    <div class="popup-card">
+      <div class="popup-icon">&#10060;</div>
+      <div class="popup-title" id="popupTitle">Wrong!</div>
+      <div class="popup-body" id="popupBody"></div>
+      <button class="popup-btn" id="popupOkBtn">Continue</button>
+    </div>
+  </div>
+
+  <div class="name-overlay hidden" id="nameOverlay" role="dialog" aria-modal="true" aria-labelledby="nameTitle">
+    <div class="name-card">
+      <div class="name-title" id="nameTitle">Save your streak</div>
+      <div class="name-body" id="nameBody">Enter your name to add your score to the leaderboard.</div>
+      <form class="name-form" id="nameForm">
+        <input
+          type="text"
+          id="playerNameInput"
+          class="name-input"
+          maxlength="20"
+          placeholder="Your name"
+          autocomplete="name"
+          required
+        />
+        <div class="name-actions">
+          <button type="submit" class="name-btn">Save score</button>
+          <button type="button" class="name-skip-btn" id="skipSaveBtn">Skip</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <script>
     const people = [
-      { name: 'Joseph Brodsky', role: 'Poet and essayist', answer: 'Exiled' },
-      { name: 'Alexander Herzen', role: 'Writer and thinker', answer: 'Exiled' },
-      { name: 'Vladimir Mayakovsky', role: 'Poet', answer: 'Suicide' },
-      { name: 'Sergei Yesenin', role: 'Poet', answer: 'Suicide' },
-      { name: 'Anna Politkovskaya', role: 'Journalist and writer', answer: 'Killed' },
-      { name: 'Boris Nemtsov', role: 'Politician and public intellectual', answer: 'Killed' },
-      { name: 'Alexander Pushkin', role: 'Poet and writer', answer: 'Killed' },
-      { name: 'Mikhail Lermontov', role: 'Poet and writer', answer: 'Killed' },
-      { name: 'Aleksandr Solzhenitsyn', role: 'Writer and dissident', answer: 'Exiled' },
-      { name: 'Mstislav Rostropovich', role: 'Cellist and conductor', answer: 'Exiled' }
+      {
+        name: 'Joseph Brodsky',
+        role: 'Poet and essayist',
+        answer: 'Exiled',
+        image: 'https://commons.wikimedia.org/wiki/Special:FilePath/Photo%20V.M%20et%20Joseph%20Brodsky.jpg'
+      },
+      {
+        name: 'Alexander Herzen',
+        role: 'Writer and thinker',
+        answer: 'Exiled',
+        image: 'https://commons.wikimedia.org/wiki/Special:FilePath/Portrait%20d%27Alexandre%20Herzen%2C%20%281812-1870%29%2C%20%C3%A9crivain%20russe%2C%20PH51776%282%29.jpg'
+      },
+      {
+        name: 'Vladimir Mayakovsky',
+        role: 'Poet',
+        answer: 'Suicide',
+        image: 'https://commons.wikimedia.org/wiki/Special:FilePath/Vladimir%20Mayakovsky%201927.jpg'
+      },
+      {
+        name: 'Sergei Yesenin',
+        role: 'Poet',
+        answer: 'Suicide',
+        image: 'https://upload.wikimedia.org/wikipedia/commons/3/32/Yesenin_1922.jpg'
+      },
+      {
+        name: 'Anna Politkovskaya',
+        role: 'Journalist and writer',
+        answer: 'Killed',
+        image: 'https://upload.wikimedia.org/wikipedia/commons/7/7f/Anna_Politkovskaya_2005.jpg'
+      },
+      {
+        name: 'Boris Nemtsov',
+        role: 'Politician and opposition figure',
+        answer: 'Killed',
+        image: 'https://upload.wikimedia.org/wikipedia/commons/5/57/Boris_Nemtsov_%282013-02-26%29.jpeg'
+      },
+      {
+        name: 'Alexander Pushkin',
+        role: 'Poet and writer',
+        answer: 'Killed',
+        image: 'https://upload.wikimedia.org/wikipedia/commons/5/56/Kiprensky_Pushkin.jpg'
+      },
+      {
+        name: 'Mikhail Lermontov',
+        role: 'Poet and writer',
+        answer: 'Killed',
+        image: 'https://upload.wikimedia.org/wikipedia/commons/2/24/Lermontov_1837.jpg'
+      },
+      {
+        name: 'Aleksandr Solzhenitsyn',
+        role: 'Writer and dissident',
+        answer: 'Exiled',
+        image: 'https://upload.wikimedia.org/wikipedia/commons/c/cb/Aleksandr_Solzhenitsyn_1974crop.jpg'
+      },
+      {
+        name: 'Mstislav Rostropovich',
+        role: 'Cellist and conductor',
+        answer: 'Exiled',
+        image: 'https://upload.wikimedia.org/wikipedia/commons/8/81/Mstislav_Rostropovich_1978.jpg'
+      }
     ];
 
-    const state = { deck: [], index: 0, answered: false, streak: 0, bestStreak: 0 };
+    const LEADERBOARD_KEY = 'russian-fates-leaderboard';
+    const MAX_LEADERBOARD_ENTRIES = 6;
+
+    const state = {
+      deck: [],
+      index: 0,
+      answered: false,
+      streak: 0,
+      bestStreak: 0,
+      pendingScore: null,
+      lastShownName: null
+    };
+
     const personName = document.getElementById('personName');
     const personRole = document.getElementById('personRole');
+    const personImage = document.getElementById('personImage');
     const scoreLine = document.getElementById('scoreLine');
     const statusText = document.getElementById('statusText');
     const restartBtn = document.getElementById('restartBtn');
+    const restartBtnBottom = document.getElementById('restartBtnBottom');
     const answerButtons = [...document.querySelectorAll('.answer-btn')];
+    const popupOverlay = document.getElementById('popupOverlay');
+    const popupBody = document.getElementById('popupBody');
+    const popupOkBtn = document.getElementById('popupOkBtn');
+    const nameOverlay = document.getElementById('nameOverlay');
+    const nameBody = document.getElementById('nameBody');
+    const nameForm = document.getElementById('nameForm');
+    const playerNameInput = document.getElementById('playerNameInput');
+    const skipSaveBtn = document.getElementById('skipSaveBtn');
+    const leaderboardList = document.getElementById('leaderboardList');
 
     function shuffle(list) {
       const copy = [...list];
@@ -234,28 +598,132 @@
       scoreLine.textContent = `Streak: ${state.streak} | Best: ${state.bestStreak}`;
     }
 
+    function getLeaderboard() {
+      try {
+        return JSON.parse(localStorage.getItem(LEADERBOARD_KEY)) || [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function saveLeaderboard(entries) {
+      localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(entries));
+    }
+
+    function escapeHtml(value) {
+      return value
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function renderLeaderboard() {
+      const entries = getLeaderboard();
+
+      if (!entries.length) {
+        leaderboardList.innerHTML = '<div class="hall-empty">No record holders yet. Set the first streak.</div>';
+        return;
+      }
+
+      leaderboardList.innerHTML = entries
+        .map((entry, index) => {
+          const topClass = index === 0 ? 'top-1' : index === 1 ? 'top-2' : index === 2 ? 'top-3' : '';
+          return `
+            <div class="hall-row ${topClass}">
+              <div class="hall-rank">#${index + 1}</div>
+              <div class="hall-name">${escapeHtml(entry.name)}</div>
+              <div class="hall-score">${entry.score}</div>
+            </div>
+          `;
+        })
+        .join('');
+    }
+
+    function addLeaderboardEntry(name, score) {
+      const cleanName = name.trim().slice(0, 20);
+      if (!cleanName || score <= 0) return;
+
+      const entries = getLeaderboard();
+      entries.push({
+        name: cleanName,
+        score,
+        createdAt: Date.now()
+      });
+
+      entries.sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        return a.createdAt - b.createdAt;
+      });
+
+      saveLeaderboard(entries.slice(0, MAX_LEADERBOARD_ENTRIES));
+      renderLeaderboard();
+    }
+
     function renderQuestion() {
       if (state.index >= state.deck.length) {
-        state.deck = shuffle(people);
+        let newDeck = shuffle(people);
+        if (state.lastShownName && newDeck.length > 1 && newDeck[0].name === state.lastShownName) {
+          const swapIdx = 1 + Math.floor(Math.random() * (newDeck.length - 1));
+          [newDeck[0], newDeck[swapIdx]] = [newDeck[swapIdx], newDeck[0]];
+        }
+        state.deck = newDeck;
         state.index = 0;
       }
 
       const item = currentPerson();
+      state.lastShownName = item.name;
       state.answered = false;
       personName.textContent = item.name;
       personRole.textContent = item.role;
+      personImage.src = item.image;
+      personImage.alt = `${item.name} portrait`;
       statusText.textContent = 'Choose an answer.';
+
       answerButtons.forEach(btn => {
         btn.disabled = false;
         btn.classList.remove('correct', 'wrong', 'dimmed');
       });
+
       updateScore();
+    }
+
+    function showWrongPopup(item, endedStreak) {
+      popupBody.textContent = `${item.name}: correct answer was ${item.answer}. Your streak was ${endedStreak}.`;
+      popupOverlay.classList.remove('hidden');
+      popupOkBtn.focus();
+    }
+
+    function dismissWrongPopup() {
+      popupOverlay.classList.add('hidden');
+
+      if (state.pendingScore && state.pendingScore > 0) {
+        openNameModal(state.pendingScore);
+      } else {
+        renderQuestion();
+      }
+    }
+
+    function openNameModal(score) {
+      state.pendingScore = score;
+      nameBody.textContent = `Wrong! Your streak was ${score}. Enter your name to claim a place in the Hall of Fame.`;
+      playerNameInput.value = '';
+      nameOverlay.classList.remove('hidden');
+      playerNameInput.focus();
+    }
+
+    function closeNameModal() {
+      nameOverlay.classList.add('hidden');
+      state.pendingScore = null;
+      renderLeaderboard();
+      renderQuestion();
     }
 
     function chooseAnswer(choice) {
       if (state.answered) return;
-      state.answered = true;
 
+      state.answered = true;
       const item = currentPerson();
       const correct = choice === item.answer;
       state.index += 1;
@@ -271,13 +739,15 @@
       if (correct) {
         state.streak += 1;
         if (state.streak > state.bestStreak) state.bestStreak = state.streak;
-        statusText.textContent = `Correct! ${item.name} -> ${item.answer}`;
+        statusText.textContent = `Correct! ${item.name} → ${item.answer}`;
         updateScore();
         setTimeout(renderQuestion, 900);
       } else {
+        const ended = state.streak;
         state.streak = 0;
         updateScore();
-        statusText.textContent = `Wrong. ${item.name} -> ${item.answer}`;
+        state.pendingScore = ended;
+        showWrongPopup(item, ended);
       }
     }
 
@@ -287,13 +757,44 @@
       state.answered = false;
       state.streak = 0;
       state.bestStreak = 0;
+      state.pendingScore = null;
+      state.lastShownName = null;
+
+      popupOverlay.classList.add('hidden');
+      nameOverlay.classList.add('hidden');
+
       updateScore();
       renderQuestion();
     }
 
-    answerButtons.forEach(btn => btn.addEventListener('click', () => chooseAnswer(btn.dataset.choice)));
-    restartBtn.addEventListener('click', restartGame);
+    answerButtons.forEach(btn =>
+      btn.addEventListener('click', () => chooseAnswer(btn.dataset.choice))
+    );
 
+    popupOkBtn.addEventListener('click', dismissWrongPopup);
+
+    popupOverlay.addEventListener('click', e => {
+      if (e.target === popupOverlay) dismissWrongPopup();
+    });
+
+    nameForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const name = playerNameInput.value.trim();
+
+      if (!name) {
+        playerNameInput.focus();
+        return;
+      }
+
+      addLeaderboardEntry(name, state.pendingScore || 0);
+      closeNameModal();
+    });
+
+    skipSaveBtn.addEventListener('click', closeNameModal);
+    restartBtn.addEventListener('click', restartGame);
+    restartBtnBottom.addEventListener('click', restartGame);
+
+    renderLeaderboard();
     restartGame();
   </script>
 </body>
