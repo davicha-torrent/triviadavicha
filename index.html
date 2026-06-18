@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Colonial Trivia Game</title>
+  <style>
+    :root {
+      --text-sm: clamp(0.9rem, 0.85rem + 0.25vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.1rem);
+      --text-lg: clamp(1.25rem, 1.05rem + 0.8vw, 1.6rem);
+      --text-xl: clamp(2rem, 1.3rem + 2.5vw, 3.4rem);
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-5: 1.25rem;
+      --space-6: 1.5rem;
+      --space-8: 2rem;
+      --radius: 1.25rem;
+      --blue: #184a9c;
+      --red: #a2293a;
+      --card: rgba(255,255,255,0.16);
+      --card-border: rgba(255,255,255,0.28);
+      --text: #ffffff;
+      --muted: rgba(255,255,255,0.78);
+      --shadow: 0 18px 50px rgba(10, 15, 35, 0.28);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-text-size-adjust: none; text-size-adjust: none; }
+    body {
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      font-size: var(--text-base);
+      color: var(--text);
+      background: linear-gradient(135deg, var(--blue) 0%, #255fc0 34%, #7d3da0 58%, var(--red) 100%);
+      display: grid;
+      place-items: center;
+      padding: var(--space-4);
+    }
+
+    button, img { display: block; }
+    button { font: inherit; cursor: pointer; border: none; }
+    .app {
+      width: min(100%, 720px);
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+      padding: clamp(var(--space-5), 4vw, var(--space-8));
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+    }
+
+    h1 {
+      font-size: var(--text-lg);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .score {
+      font-size: var(--text-sm);
+      color: var(--muted);
+    }
+
+    .flag-box {
+      width: 100%;
+      background: rgba(255,255,255,0.1);
+      border-radius: 1rem;
+      padding: var(--space-4);
+      margin-bottom: var(--space-5);
+    }
+
+    .flag-box img {
+      width: 100%;
+      max-width: 420px;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      margin: 0 auto;
+      border-radius: 0.9rem;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.22);
+    }
+
+    .country {
+      text-align: center;
+      margin-bottom: var(--space-5);
+    }
+
+    .country-name {
+      font-size: var(--text-xl);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      margin-bottom: var(--space-2);
+    }
+
+    .question {
+      color: var(--muted);
+      font-size: var(--text-sm);
+    }
+
+    .answers {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+      margin-bottom: var(--space-5);
+    }
+
+    .answer-btn {
+      min-height: 64px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.14);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,0.22);
+      font-weight: 700;
+      transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+    }
+
+    .answer-btn:hover { transform: translateY(-2px); }
+    .answer-btn.correct { background: rgba(37, 201, 122, 0.24); border-color: rgba(37, 201, 122, 0.55); }
+    .answer-btn.wrong { background: rgba(255, 99, 132, 0.24); border-color: rgba(255, 99, 132, 0.55); }
+    .answer-btn.dimmed { opacity: 0.6; }
+
+    .status {
+      min-height: 54px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      color: var(--muted);
+      margin-bottom: var(--space-5);
+      font-size: var(--text-sm);
+    }
+
+    .controls {
+      display: flex;
+      gap: var(--space-3);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .control-btn {
+      min-height: 46px;
+      padding: 0 var(--space-5);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.18);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,0.24);
+      font-weight: 600;
+    }
+
+    .hidden { display: none; }
+
+    /* Wrong-answer popup */
+    .popup-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      display: grid;
+      place-items: center;
+      z-index: 100;
+      animation: fadeIn 160ms ease;
+    }
+    .popup-overlay.hidden { display: none; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    .popup-card {
+      background: rgba(180, 20, 40, 0.92);
+      border: 1px solid rgba(255, 120, 120, 0.4);
+      backdrop-filter: blur(14px);
+      border-radius: var(--radius);
+      padding: clamp(var(--space-5), 5vw, var(--space-8));
+      max-width: min(92vw, 380px);
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      animation: popIn 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.85); opacity: 0; }
+      to   { transform: scale(1);    opacity: 1; }
+    }
+
+    .popup-icon {
+      font-size: 2.2rem;
+      margin-bottom: var(--space-3);
+    }
+
+    .popup-title {
+      font-size: var(--text-lg);
+      font-weight: 700;
+      margin-bottom: var(--space-3);
+    }
+
+    .popup-body {
+      font-size: var(--text-sm);
+      color: rgba(255,255,255,0.88);
+      line-height: 1.5;
+      margin-bottom: var(--space-5);
+    }
+
+    .popup-btn {
+      min-height: 44px;
+      padding: 0 var(--space-6);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.22);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,0.35);
+      font-weight: 600;
+      font: inherit;
+      cursor: pointer;
+      transition: background 150ms ease;
+    }
+    .popup-btn:hover { background: rgba(255,255,255,0.32); }
+
+    @media (max-width: 640px) {
+      .answers { grid-template-columns: 1fr; }
+      .top { flex-direction: column; align-items: flex-start; }
+      .control-btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="top">
+      <h1>British or French?</h1>
+      <div class="score" id="scoreLine">Streak: 0 | Best: 0</div>
+    </div>
+
+    <div class="flag-box">
+      <img id="countryFlag" src="" alt="Country flag" width="420" height="315" loading="eager" decoding="async" />
+    </div>
+
+    <section class="country">
+      <div class="country-name" id="countryName">Country</div>
+      <div class="question">Was it a British colony or a French colony?</div>
+    </section>
+
+    <section class="answers" aria-label="Answer choices">
+      <button class="answer-btn" data-choice="British">British Colony</button>
+      <button class="answer-btn" data-choice="French">French Colony</button>
+    </section>
+
+    <div class="status" id="statusText">Choose an answer.</div>
+
+    <div class="controls">
+      <button class="control-btn" id="restartBtn">Restart</button>
+    </div>
+  </main>
+
+  <!-- Wrong-answer popup -->
+  <div class="popup-overlay hidden" id="popupOverlay" role="dialog" aria-modal="true" aria-labelledby="popupTitle">
+    <div class="popup-card">
+      <div class="popup-icon">&#10060;</div>
+      <div class="popup-title" id="popupTitle">Wrong!</div>
+      <div class="popup-body" id="popupBody"></div>
+      <button class="popup-btn" id="popupOkBtn">Continue</button>
+    </div>
+  </div>
+
+  <script>
+    const countries = [
+      // British colonies
+      { name: 'India', flag: 'https://flagcdn.com/w640/in.png', answer: 'British' },
+      { name: 'Nigeria', flag: 'https://flagcdn.com/w640/ng.png', answer: 'British' },
+      { name: 'Kenya', flag: 'https://flagcdn.com/w640/ke.png', answer: 'British' },
+      { name: 'Ghana', flag: 'https://flagcdn.com/w640/gh.png', answer: 'British' },
+      { name: 'Jamaica', flag: 'https://flagcdn.com/w640/jm.png', answer: 'British' },
+      { name: 'Egypt', flag: 'https://flagcdn.com/w640/eg.png', answer: 'British' },
+      { name: 'Sudan', flag: 'https://flagcdn.com/w640/sd.png', answer: 'British' },
+      { name: 'South Africa', flag: 'https://flagcdn.com/w640/za.png', answer: 'British' },
+      { name: 'Zimbabwe', flag: 'https://flagcdn.com/w640/zw.png', answer: 'British' },
+      { name: 'Uganda', flag: 'https://flagcdn.com/w640/ug.png', answer: 'British' },
+      { name: 'Tanzania', flag: 'https://flagcdn.com/w640/tz.png', answer: 'British' },
+      { name: 'Malawi', flag: 'https://flagcdn.com/w640/mw.png', answer: 'British' },
+      { name: 'Zambia', flag: 'https://flagcdn.com/w640/zm.png', answer: 'British' },
+      { name: 'Sierra Leone', flag: 'https://flagcdn.com/w640/sl.png', answer: 'British' },
+      { name: 'Gambia', flag: 'https://flagcdn.com/w640/gm.png', answer: 'British' },
+      { name: 'Botswana', flag: 'https://flagcdn.com/w640/bw.png', answer: 'British' },
+      { name: 'Lesotho', flag: 'https://flagcdn.com/w640/ls.png', answer: 'British' },
+      { name: 'Eswatini', flag: 'https://flagcdn.com/w640/sz.png', answer: 'British' },
+      { name: 'Hong Kong', flag: 'https://flagcdn.com/w640/hk.png', answer: 'British' },
+      { name: 'Myanmar', flag: 'https://flagcdn.com/w640/mm.png', answer: 'British' },
+      { name: 'Malaysia', flag: 'https://flagcdn.com/w640/my.png', answer: 'British' },
+      { name: 'Singapore', flag: 'https://flagcdn.com/w640/sg.png', answer: 'British' },
+      { name: 'Cyprus', flag: 'https://flagcdn.com/w640/cy.png', answer: 'British' },
+      { name: 'Malta', flag: 'https://flagcdn.com/w640/mt.png', answer: 'British' },
+      { name: 'Trinidad & Tobago', flag: 'https://flagcdn.com/w640/tt.png', answer: 'British' },
+      { name: 'Barbados', flag: 'https://flagcdn.com/w640/bb.png', answer: 'British' },
+      { name: 'Guyana', flag: 'https://flagcdn.com/w640/gy.png', answer: 'British' },
+      { name: 'Fiji', flag: 'https://flagcdn.com/w640/fj.png', answer: 'British' },
+      { name: 'Papua New Guinea', flag: 'https://flagcdn.com/w640/pg.png', answer: 'British' },
+      { name: 'Australia', flag: 'https://flagcdn.com/w640/au.png', answer: 'British' },
+      { name: 'New Zealand', flag: 'https://flagcdn.com/w640/nz.png', answer: 'British' },
+      { name: 'Canada', flag: 'https://flagcdn.com/w640/ca.png', answer: 'British' },
+      // French colonies
+      { name: 'Senegal', flag: 'https://flagcdn.com/w640/sn.png', answer: 'French' },
+      { name: 'Algeria', flag: 'https://flagcdn.com/w640/dz.png', answer: 'French' },
+      { name: 'Mali', flag: 'https://flagcdn.com/w640/ml.png', answer: 'French' },
+      { name: 'Madagascar', flag: 'https://flagcdn.com/w640/mg.png', answer: 'French' },
+      { name: 'Vietnam', flag: 'https://flagcdn.com/w640/vn.png', answer: 'French' },
+      { name: 'Morocco', flag: 'https://flagcdn.com/w640/ma.png', answer: 'French' },
+      { name: 'Tunisia', flag: 'https://flagcdn.com/w640/tn.png', answer: 'French' },
+      { name: 'Ivory Coast', flag: 'https://flagcdn.com/w640/ci.png', answer: 'French' },
+      { name: 'Guinea', flag: 'https://flagcdn.com/w640/gn.png', answer: 'French' },
+      { name: 'Burkina Faso', flag: 'https://flagcdn.com/w640/bf.png', answer: 'French' },
+      { name: 'Niger', flag: 'https://flagcdn.com/w640/ne.png', answer: 'French' },
+      { name: 'Chad', flag: 'https://flagcdn.com/w640/td.png', answer: 'French' },
+      { name: 'Central African Republic', flag: 'https://flagcdn.com/w640/cf.png', answer: 'French' },
+      { name: 'Republic of Congo', flag: 'https://flagcdn.com/w640/cg.png', answer: 'French' },
+      { name: 'Gabon', flag: 'https://flagcdn.com/w640/ga.png', answer: 'French' },
+      { name: 'Cameroon', flag: 'https://flagcdn.com/w640/cm.png', answer: 'French' },
+      { name: 'Togo', flag: 'https://flagcdn.com/w640/tg.png', answer: 'French' },
+      { name: 'Benin', flag: 'https://flagcdn.com/w640/bj.png', answer: 'French' },
+      { name: 'Djibouti', flag: 'https://flagcdn.com/w640/dj.png', answer: 'French' },
+      { name: 'Mauritania', flag: 'https://flagcdn.com/w640/mr.png', answer: 'French' },
+      { name: 'Syria', flag: 'https://flagcdn.com/w640/sy.png', answer: 'French' },
+      { name: 'Lebanon', flag: 'https://flagcdn.com/w640/lb.png', answer: 'French' },
+      { name: 'Cambodia', flag: 'https://flagcdn.com/w640/kh.png', answer: 'French' },
+      { name: 'Laos', flag: 'https://flagcdn.com/w640/la.png', answer: 'French' },
+      { name: 'Haiti', flag: 'https://flagcdn.com/w640/ht.png', answer: 'French' },
+      { name: 'Guadeloupe', flag: 'https://flagcdn.com/w640/gp.png', answer: 'French' },
+      { name: 'Martinique', flag: 'https://flagcdn.com/w640/mq.png', answer: 'French' },
+      { name: 'French Guiana', flag: 'https://flagcdn.com/w640/gf.png', answer: 'French' }
+    ];
+
+    const state = { deck: [], index: 0, answered: false, streak: 0, bestStreak: 0, lastShownName: null };
+    const countryName = document.getElementById('countryName');
+    const countryFlag = document.getElementById('countryFlag');
+    const scoreLine = document.getElementById('scoreLine');
+    const statusText = document.getElementById('statusText');
+    const restartBtn = document.getElementById('restartBtn');
+    const answerButtons = [...document.querySelectorAll('.answer-btn')];
+    const popupOverlay = document.getElementById('popupOverlay');
+    const popupBody = document.getElementById('popupBody');
+    const popupOkBtn = document.getElementById('popupOkBtn');
+
+    function shuffle(list) {
+      const copy = [...list];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function currentCountry() {
+      return state.deck[state.index];
+    }
+
+    function updateScore() {
+      scoreLine.textContent = `Streak: ${state.streak} | Best: ${state.bestStreak}`;
+    }
+
+    function renderQuestion() {
+      if (state.index >= state.deck.length) {
+        let newDeck = shuffle(countries);
+        // Prevent the first card of the new cycle from being the same country just shown
+        if (state.lastShownName && newDeck.length > 1 && newDeck[0].name === state.lastShownName) {
+          const swapIdx = 1 + Math.floor(Math.random() * (newDeck.length - 1));
+          [newDeck[0], newDeck[swapIdx]] = [newDeck[swapIdx], newDeck[0]];
+        }
+        state.deck = newDeck;
+        state.index = 0;
+      }
+
+      const item = currentCountry();
+      state.lastShownName = item.name;
+      state.answered = false;
+      countryName.textContent = item.name;
+      countryFlag.src = item.flag;
+      countryFlag.alt = `${item.name} flag`;
+      statusText.textContent = 'Choose an answer.';
+      answerButtons.forEach(btn => {
+        btn.disabled = false;
+        btn.classList.remove('correct', 'wrong', 'dimmed');
+      });
+      updateScore();
+    }
+
+    function showWrongPopup(item, endedStreak) {
+      popupBody.textContent = `${item.name} was a ${item.answer} colony. Your streak was: ${endedStreak}.`;
+      popupOverlay.classList.remove('hidden');
+      popupOkBtn.focus();
+    }
+
+    function dismissPopup() {
+      popupOverlay.classList.add('hidden');
+      renderQuestion();
+    }
+
+    function chooseAnswer(choice) {
+      if (state.answered) return;
+      state.answered = true;
+      const item = currentCountry();
+      const correct = choice === item.answer;
+      state.index += 1;
+
+      answerButtons.forEach(btn => {
+        btn.disabled = true;
+        const value = btn.dataset.choice;
+        if (value === item.answer) btn.classList.add('correct');
+        else if (value === choice) btn.classList.add('wrong');
+        else btn.classList.add('dimmed');
+      });
+
+      if (correct) {
+        state.streak += 1;
+        if (state.streak > state.bestStreak) state.bestStreak = state.streak;
+        statusText.textContent = `Correct! Streak: ${state.streak}`;
+        updateScore();
+        setTimeout(renderQuestion, 900);
+      } else {
+        const ended = state.streak;
+        state.streak = 0;
+        updateScore();
+        showWrongPopup(item, ended);
+      }
+    }
+
+    function restartGame() {
+      state.deck = shuffle(countries);
+      state.index = 0;
+      state.answered = false;
+      state.streak = 0;
+      state.bestStreak = 0;
+      state.lastShownName = null;
+      popupOverlay.classList.add('hidden');
+      updateScore();
+      renderQuestion();
+    }
+
+    answerButtons.forEach(btn => btn.addEventListener('click', () => chooseAnswer(btn.dataset.choice)));
+    popupOkBtn.addEventListener('click', dismissPopup);
+    popupOverlay.addEventListener('click', e => { if (e.target === popupOverlay) dismissPopup(); });
+    restartBtn.addEventListener('click', restartGame);
+
+    restartGame();
+  </script>
+</body>
+</html>
