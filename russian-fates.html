@@ -1,1 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Russian Fates Trivia</title>
+  <style>
+    :root {
+      --text-sm: clamp(0.9rem, 0.85rem + 0.25vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.1rem);
+      --text-lg: clamp(1.25rem, 1.05rem + 0.8vw, 1.6rem);
+      --text-xl: clamp(2rem, 1.3rem + 2.5vw, 3.4rem);
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-5: 1.25rem;
+      --space-6: 1.5rem;
+      --space-8: 2rem;
+      --radius: 1.25rem;
+      --blue: #184a9c;
+      --red: #a2293a;
+      --card: rgba(255,255,255,0.16);
+      --card-border: rgba(255,255,255,0.28);
+      --text: #ffffff;
+      --muted: rgba(255,255,255,0.78);
+      --shadow: 0 18px 50px rgba(10, 15, 35, 0.28);
+    }
 
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-text-size-adjust: none; text-size-adjust: none; }
+    body {
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      font-size: var(--text-base);
+      color: var(--text);
+      background: linear-gradient(135deg, var(--blue) 0%, #255fc0 34%, #7d3da0 58%, var(--red) 100%);
+      display: grid;
+      place-items: center;
+      padding: var(--space-4);
+    }
+
+    button, a { font: inherit; }
+    button { cursor: pointer; border: none; }
+    a { color: white; text-decoration: none; }
+
+    .app {
+      width: min(100%, 760px);
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+      padding: clamp(var(--space-5), 4vw, var(--space-8));
+    }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-3);
+      margin-bottom: var(--space-5);
+      flex-wrap: wrap;
+    }
+
+    .nav a, .nav button {
+      min-height: 42px;
+      padding: 0 var(--space-5);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.16);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,0.24);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+    }
+
+    h1 {
+      font-size: var(--text-lg);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .score {
+      font-size: var(--text-sm);
+      color: var(--muted);
+    }
+
+    .person-box {
+      background: rgba(255,255,255,0.1);
+      border-radius: 1rem;
+      padding: var(--space-6);
+      margin-bottom: var(--space-5);
+      text-align: center;
+    }
+
+    .person-name {
+      font-size: var(--text-xl);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      margin-bottom: var(--space-2);
+    }
+
+    .person-role {
+      color: var(--muted);
+      font-size: var(--text-sm);
+    }
+
+    .answers {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: var(--space-4);
+      margin-bottom: var(--space-5);
+    }
+
+    .answer-btn {
+      min-height: 64px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.14);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,0.22);
+      font-weight: 700;
+      transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+      padding: 0 var(--space-3);
+    }
+
+    .answer-btn:hover { transform: translateY(-2px); }
+    .answer-btn.correct { background: rgba(37, 201, 122, 0.24); border-color: rgba(37, 201, 122, 0.55); }
+    .answer-btn.wrong { background: rgba(255, 99, 132, 0.24); border-color: rgba(255, 99, 132, 0.55); }
+    .answer-btn.dimmed { opacity: 0.6; }
+
+    .status {
+      min-height: 54px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      color: var(--muted);
+      margin-bottom: var(--space-5);
+      font-size: var(--text-sm);
+    }
+
+    .controls {
+      display: flex;
+      gap: var(--space-3);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .control-btn {
+      min-height: 46px;
+      padding: 0 var(--space-5);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.18);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,0.24);
+      font-weight: 600;
+    }
+
+    @media (max-width: 700px) {
+      .answers { grid-template-columns: 1fr; }
+      .top { flex-direction: column; align-items: flex-start; }
+      .control-btn, .nav a, .nav button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="nav">
+      <a href="index.html">Colony Game</a>
+      <button type="button" id="restartBtn">Restart</button>
+    </div>
+
+    <div class="top">
+      <h1>Russian Fates</h1>
+      <div class="score" id="scoreLine">Streak: 0 | Best: 0</div>
+    </div>
+
+    <section class="person-box">
+      <div class="person-name" id="personName">Name</div>
+      <div class="person-role" id="personRole">Writer / Musician / Intellectual</div>
+    </section>
+
+    <section class="answers" aria-label="Answer choices">
+      <button class="answer-btn" data-choice="Killed">Killed</button>
+      <button class="answer-btn" data-choice="Exiled">Exiled</button>
+      <button class="answer-btn" data-choice="Suicide">Suicide</button>
+    </section>
+
+    <div class="status" id="statusText">Choose an answer.</div>
+  </main>
+
+  <script>
+    const people = [
+      { name: 'Joseph Brodsky', role: 'Poet and essayist', answer: 'Exiled' },
+      { name: 'Alexander Herzen', role: 'Writer and thinker', answer: 'Exiled' },
+      { name: 'Vladimir Mayakovsky', role: 'Poet', answer: 'Suicide' },
+      { name: 'Sergei Yesenin', role: 'Poet', answer: 'Suicide' },
+      { name: 'Anna Politkovskaya', role: 'Journalist and writer', answer: 'Killed' },
+      { name: 'Boris Nemtsov', role: 'Politician and public intellectual', answer: 'Killed' },
+      { name: 'Alexander Pushkin', role: 'Poet and writer', answer: 'Killed' },
+      { name: 'Mikhail Lermontov', role: 'Poet and writer', answer: 'Killed' },
+      { name: 'Aleksandr Solzhenitsyn', role: 'Writer and dissident', answer: 'Exiled' },
+      { name: 'Mstislav Rostropovich', role: 'Cellist and conductor', answer: 'Exiled' }
+    ];
+
+    const state = { deck: [], index: 0, answered: false, streak: 0, bestStreak: 0 };
+    const personName = document.getElementById('personName');
+    const personRole = document.getElementById('personRole');
+    const scoreLine = document.getElementById('scoreLine');
+    const statusText = document.getElementById('statusText');
+    const restartBtn = document.getElementById('restartBtn');
+    const answerButtons = [...document.querySelectorAll('.answer-btn')];
+
+    function shuffle(list) {
+      const copy = [...list];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function currentPerson() {
+      return state.deck[state.index];
+    }
+
+    function updateScore() {
+      scoreLine.textContent = `Streak: ${state.streak} | Best: ${state.bestStreak}`;
+    }
+
+    function renderQuestion() {
+      if (state.index >= state.deck.length) {
+        state.deck = shuffle(people);
+        state.index = 0;
+      }
+
+      const item = currentPerson();
+      state.answered = false;
+      personName.textContent = item.name;
+      personRole.textContent = item.role;
+      statusText.textContent = 'Choose an answer.';
+      answerButtons.forEach(btn => {
+        btn.disabled = false;
+        btn.classList.remove('correct', 'wrong', 'dimmed');
+      });
+      updateScore();
+    }
+
+    function chooseAnswer(choice) {
+      if (state.answered) return;
+      state.answered = true;
+
+      const item = currentPerson();
+      const correct = choice === item.answer;
+      state.index += 1;
+
+      answerButtons.forEach(btn => {
+        btn.disabled = true;
+        const value = btn.dataset.choice;
+        if (value === item.answer) btn.classList.add('correct');
+        else if (value === choice) btn.classList.add('wrong');
+        else btn.classList.add('dimmed');
+      });
+
+      if (correct) {
+        state.streak += 1;
+        if (state.streak > state.bestStreak) state.bestStreak = state.streak;
+        statusText.textContent = `Correct! ${item.name} -> ${item.answer}`;
+        updateScore();
+        setTimeout(renderQuestion, 900);
+      } else {
+        state.streak = 0;
+        updateScore();
+        statusText.textContent = `Wrong. ${item.name} -> ${item.answer}`;
+      }
+    }
+
+    function restartGame() {
+      state.deck = shuffle(people);
+      state.index = 0;
+      state.answered = false;
+      state.streak = 0;
+      state.bestStreak = 0;
+      updateScore();
+      renderQuestion();
+    }
+
+    answerButtons.forEach(btn => btn.addEventListener('click', () => chooseAnswer(btn.dataset.choice)));
+    restartBtn.addEventListener('click', restartGame);
+
+    restartGame();
+  </script>
+</body>
+</html>
