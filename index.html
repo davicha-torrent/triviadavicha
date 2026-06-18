@@ -43,42 +43,48 @@
     button, img { display: block; }
     button { font: inherit; cursor: pointer; border: none; }
 
-    .app {
+    .app-shell {
       position: relative;
       width: min(100%, 720px);
+      overflow: visible;
+    }
+
+    .corner-link {
+      position: absolute;
+      top: 0;
+      right: -14rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 0 var(--space-5);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.24);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,0.38);
+      box-shadow: 0 10px 26px rgba(0,0,0,0.18);
+      font-size: var(--text-sm);
+      font-weight: 700;
+      text-decoration: none;
+      white-space: nowrap;
+      backdrop-filter: blur(10px);
+      transition: transform 160ms ease, background 160ms ease, box-shadow 160ms ease;
+    }
+
+    .corner-link:hover {
+      background: rgba(255,255,255,0.34);
+      transform: translateY(-2px);
+      box-shadow: 0 14px 32px rgba(0,0,0,0.24);
+    }
+
+    .app {
+      width: 100%;
       background: var(--card);
       border: 1px solid var(--card-border);
       border-radius: var(--radius);
       backdrop-filter: blur(10px);
       box-shadow: var(--shadow);
       padding: clamp(var(--space-5), 4vw, var(--space-8));
-    }
-
-    .corner-link {
-      position: absolute;
-      top: -18px;
-      right: -18px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 44px;
-      padding: 0 var(--space-5);
-      border-radius: 999px;
-      background: rgba(255,255,255,0.32);
-      color: var(--text);
-      border: 1px solid rgba(255,255,255,0.42);
-      box-shadow: 0 10px 24px rgba(0,0,0,0.24);
-      font-size: var(--text-sm);
-      font-weight: 700;
-      text-decoration: none;
-      white-space: nowrap;
-      transition: transform 160ms ease, background 160ms ease, box-shadow 160ms ease;
-    }
-
-    .corner-link:hover {
-      background: rgba(255,255,255,0.42);
-      transform: translateY(-2px);
-      box-shadow: 0 14px 30px rgba(0,0,0,0.28);
     }
 
     .top {
@@ -253,11 +259,19 @@
 
     .popup-btn:hover { background: rgba(255,255,255,0.32); }
 
-    @media (max-width: 640px) {
-      body {
-        padding-top: calc(var(--space-8) + 10px);
+    @media (max-width: 1100px) {
+      .app-shell {
+        width: min(100%, 760px);
+        padding-top: 56px;
       }
 
+      .corner-link {
+        top: 0;
+        right: 0;
+      }
+    }
+
+    @media (max-width: 640px) {
       .answers { grid-template-columns: 1fr; }
 
       .top {
@@ -266,11 +280,9 @@
       }
 
       .corner-link {
-        top: -14px;
-        right: 10px;
-        min-height: 40px;
-        padding: 0 var(--space-4);
-        max-width: calc(100% - 20px);
+        position: static;
+        margin-bottom: var(--space-4);
+        width: 100%;
       }
 
       .control-btn {
@@ -280,34 +292,36 @@
   </style>
 </head>
 <body>
-  <main class="app">
+  <div class="app-shell">
     <a href="russian-fates.html" class="corner-link">Russian Fates Trivia</a>
 
-    <div class="top">
-      <h1>British or French?</h1>
-      <div class="score" id="scoreLine">Streak: 0 | Best: 0</div>
-    </div>
+    <main class="app">
+      <div class="top">
+        <h1>British or French?</h1>
+        <div class="score" id="scoreLine">Streak: 0 | Best: 0</div>
+      </div>
 
-    <div class="flag-box">
-      <img id="countryFlag" src="" alt="Country flag" width="420" height="315" loading="eager" decoding="async" />
-    </div>
+      <div class="flag-box">
+        <img id="countryFlag" src="" alt="Country flag" width="420" height="315" loading="eager" decoding="async" />
+      </div>
 
-    <section class="country">
-      <div class="country-name" id="countryName">Country</div>
-      <div class="question">Was it a British colony or a French colony?</div>
-    </section>
+      <section class="country">
+        <div class="country-name" id="countryName">Country</div>
+        <div class="question">Was it a British colony or a French colony?</div>
+      </section>
 
-    <section class="answers" aria-label="Answer choices">
-      <button class="answer-btn" data-choice="British">British Colony</button>
-      <button class="answer-btn" data-choice="French">French Colony</button>
-    </section>
+      <section class="answers" aria-label="Answer choices">
+        <button class="answer-btn" data-choice="British">British Colony</button>
+        <button class="answer-btn" data-choice="French">French Colony</button>
+      </section>
 
-    <div class="status" id="statusText">Choose an answer.</div>
+      <div class="status" id="statusText">Choose an answer.</div>
 
-    <div class="controls">
-      <button class="control-btn" id="restartBtn">Restart</button>
-    </div>
-  </main>
+      <div class="controls">
+        <button class="control-btn" id="restartBtn">Restart</button>
+      </div>
+    </main>
+  </div>
 
   <div class="popup-overlay hidden" id="popupOverlay" role="dialog" aria-modal="true" aria-labelledby="popupTitle">
     <div class="popup-card">
