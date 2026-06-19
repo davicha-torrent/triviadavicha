@@ -494,7 +494,7 @@
       <section class="hall-of-fame" aria-labelledby="hallTitle">
         <div class="hall-head">
           <div class="hall-title" id="hallTitle">Hall of Fame</div>
-          <div class="hall-note">Best streaks</div>
+          <div class="hall-note">Global best streaks</div>
         </div>
         <div class="hall-list" id="leaderboardList"></div>
       </section>
@@ -513,7 +513,7 @@
   <div class="name-overlay hidden" id="nameOverlay" role="dialog" aria-modal="true" aria-labelledby="nameTitle">
     <div class="name-card">
       <div class="name-title" id="nameTitle">Save your streak</div>
-      <div class="name-body" id="nameBody">Enter your name to add your score to the leaderboard.</div>
+      <div class="name-body" id="nameBody">Enter your name to add your score to the global leaderboard.</div>
       <form class="name-form" id="nameForm">
         <input
           type="text"
@@ -533,6 +533,11 @@
   </div>
 
   <script>
+    const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    const GAME_NAME = 'colonial';
+    const MAX_LEADERBOARD_ENTRIES = 6;
+
     const countries = [
       { name: 'India', flag: 'https://flagcdn.com/w640/in.png', answer: 'British' },
       { name: 'Nigeria', flag: 'https://flagcdn.com/w640/ng.png', answer: 'British' },
@@ -596,9 +601,6 @@
       { name: 'French Guiana', flag: 'https://flagcdn.com/w640/gf.png', answer: 'French' }
     ];
 
-    const LEADERBOARD_KEY = 'colonial-trivia-leaderboard';
-    const MAX_LEADERBOARD_ENTRIES = 6;
-
     const state = {
       deck: [],
       index: 0,
@@ -618,7 +620,6 @@
     const popupOverlay = document.getElementById('popupOverlay');
     const popupBody = document.getElementById('popupBody');
     const popupOkBtn = document.getElementById('popupOkBtn');
-
     const nameOverlay = document.getElementById('nameOverlay');
     const nameBody = document.getElementById('nameBody');
     const nameForm = document.getElementById('nameForm');
@@ -643,18 +644,6 @@
       scoreLine.textContent = `Streak: ${state.streak} | Best: ${state.bestStreak}`;
     }
 
-    function getLeaderboard() {
-      try {
-        return JSON.parse(localStorage.getItem(LEADERBOARD_KEY)) || [];
-      } catch (error) {
-        return [];
-      }
-    }
-
-    function saveLeaderboard(entries) {
-      localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(entries));
-    }
-
     function escapeHtml(value) {
       return value
         .replaceAll('&', '&amp;')
@@ -664,46 +653,79 @@
         .replaceAll("'", '&#39;');
     }
 
-    function renderLeaderboard() {
-      const entries = getLeaderboard();
+    async function fetchLeaderboard() {
+      const url = `${SUPABASE_URL}/rest/v1/leaderboard?select=player,score,created_at,game&game=eq.${encodeURIComponent(GAME_NAME)}&order=score.desc,created_at.asc&limit=${MAX_LEADERBOARD_ENTRIES}`;
 
-      if (!entries.length) {
-        leaderboardList.innerHTML = '<div class="hall-empty">No record holders yet. Set the first streak.</div>';
-        return;
+      const response = await fetch(url, {
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Could not load leaderboard.');
       }
 
-      leaderboardList.innerHTML = entries
-        .map((entry, index) => {
-          const topClass = index === 0 ? 'top-1' : index === 1 ? 'top-2' : index === 2 ? 'top-3' : '';
-          return `
-            <div class="hall-row ${topClass}">
-              <div class="hall-rank">#${index + 1}</div>
-              <div class="hall-name">${escapeHtml(entry.name)}</div>
-              <div class="hall-score">${entry.score}</div>
-            </div>
-          `;
-        })
-        .join('');
+      return response.json();
     }
 
-    function addLeaderboardEntry(name, score) {
+    async function insertLeaderboardEntry(name, score) {
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          Prefer: 'return=minimal'
+        },
+        body: JSON.stringify({
+          player: name,
+          score,
+          game: GAME_NAME
+        })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Could not save score.');
+      }
+    }
+
+    async function renderLeaderboard() {
+      leaderboardList.innerHTML = '<div class="hall-empty">Loading global leaderboard...</div>';
+
+      try {
+        const entries = await fetchLeaderboard();
+
+        if (!entries.length) {
+          leaderboardList.innerHTML = '<div class="hall-empty">No record holders yet. Set the first streak.</div>';
+          return;
+        }
+
+        leaderboardList.innerHTML = entries
+          .map((entry, index) => {
+            const topClass = index === 0 ? 'top-1' : index === 1 ? 'top-2' : index === 2 ? 'top-3' : '';
+            return `
+              <div class="hall-row ${topClass}">
+                <div class="hall-rank">#${index + 1}</div>
+                <div class="hall-name">${escapeHtml(entry.player)}</div>
+                <div class="hall-score">${entry.score}</div>
+              </div>
+            `;
+          })
+          .join('');
+      } catch (error) {
+        leaderboardList.innerHTML = '<div class="hall-empty">Leaderboard unavailable right now.</div>';
+      }
+    }
+
+    async function addLeaderboardEntry(name, score) {
       const cleanName = name.trim().slice(0, 20);
       if (!cleanName || score <= 0) return;
 
-      const entries = getLeaderboard();
-      entries.push({
-        name: cleanName,
-        score,
-        createdAt: Date.now()
-      });
-
-      entries.sort((a, b) => {
-        if (b.score !== a.score) return b.score - a.score;
-        return a.createdAt - b.createdAt;
-      });
-
-      saveLeaderboard(entries.slice(0, MAX_LEADERBOARD_ENTRIES));
-      renderLeaderboard();
+      await insertLeaderboardEntry(cleanName, score);
+      await renderLeaderboard();
     }
 
     function renderQuestion() {
@@ -760,7 +782,6 @@
     function closeNameModal() {
       nameOverlay.classList.add('hidden');
       state.pendingScore = null;
-      renderLeaderboard();
       renderQuestion();
     }
 
@@ -821,7 +842,7 @@
       if (e.target === popupOverlay) dismissWrongPopup();
     });
 
-    nameForm.addEventListener('submit', e => {
+    nameForm.addEventListener('submit', async e => {
       e.preventDefault();
       const name = playerNameInput.value.trim();
 
@@ -830,8 +851,19 @@
         return;
       }
 
-      addLeaderboardEntry(name, state.pendingScore || 0);
-      closeNameModal();
+      const saveButton = nameForm.querySelector('.name-btn');
+      saveButton.disabled = true;
+      saveButton.textContent = 'Saving...';
+
+      try {
+        await addLeaderboardEntry(name, state.pendingScore || 0);
+        closeNameModal();
+      } catch (error) {
+        nameBody.textContent = 'Could not save score right now. Check your Supabase URL, key, table, and policies.';
+      } finally {
+        saveButton.disabled = false;
+        saveButton.textContent = 'Save score';
+      }
     });
 
     skipSaveBtn.addEventListener('click', closeNameModal);
