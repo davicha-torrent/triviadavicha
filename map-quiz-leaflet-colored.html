@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Birth–Death Map Quiz Colored</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:#e8eef4;color:#1f1e1b;height:100vh;display:flex;flex-direction:column}
+#topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#fff;border-bottom:1px solid #ddd;gap:12px;flex-shrink:0}
+#topbar h1{font-size:1rem;font-weight:700;letter-spacing:-.01em}#meta{font-size:.85rem;color:#888}
+#map{flex:1;min-height:0;position:relative}#map::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(135deg, rgba(74,144,226,.12), rgba(255,107,107,.08));mix-blend-mode:multiply}
+#panel{position:absolute;bottom:20px;right:16px;z-index:999;width:300px;background:rgba(255,255,255,.97);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.14);border:1px solid rgba(0,0,0,.08);padding:16px;display:flex;flex-direction:column;gap:10px}
+#panel h2{font-size:1.3rem;font-weight:700;letter-spacing:-.02em}
+#guessInput{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:9px;font-size:.95rem;background:#f7f6f3}
+.row{display:flex;gap:8px}.btn{flex:1;padding:9px 0;border-radius:9px;border:1px solid #ddd;background:#fff;font-size:.9rem;cursor:pointer;font-weight:500}.btn.primary{background:#0c5f66;color:#fff;border-color:transparent}.btn.primary:hover{background:#09484d}
+#statusMsg{font-size:.88rem;color:#888;padding:8px 10px;background:#f7f6f3;border-radius:8px;border:1px solid #eee}#statusMsg.good{color:#2b6a1a;background:#eef6e8}#statusMsg.bad{color:#8a2450;background:#fceef4}
+#revealBox{font-size:.86rem;color:#555;border-top:1px solid #eee;padding-top:8px;display:none}#revealBox b{color:#1f1e1b;display:block;margin-bottom:3px}
+.map-tip{background:rgba(255,255,255,.95)!important;border:1px solid rgba(0,0,0,.12)!important;border-radius:7px!important;padding:3px 7px!important;font-size:11px!important;color:#1f1e1b!important;box-shadow:0 2px 8px rgba(0,0,0,.12)!important;font-family:Inter,sans-serif!important;white-space:nowrap}.map-tip::before{display:none!important}
+</style>
+</head>
+<body>
+<div id="topbar"><div><h1>Birth–Death Map Quiz</h1><div id="meta">Round <span id="roundNum">1</span> / 5 · Score <span id="scoreNum">0</span></div></div></div>
+<div id="map"></div>
+<div id="panel"><h2>Who is it?</h2><form id="form"><input id="guessInput" placeholder="Type full name" autocomplete="off"/><div class="row" style="margin-top:8px"><button class="btn primary" type="submit">Check</button><button class="btn" type="button" id="nextBtn">Next</button><button class="btn" type="button" id="restartBtn">Restart</button></div></form><div id="statusMsg">Enter a name and check the answer.</div><div id="revealBox"><b id="revealName"></b><span id="revealDetail"></span></div></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const figures=[{name:'Joseph Stalin',aliases:['stalin','joseph stalin','ioseb dzhugashvili'],birth:{label:'1878 · Gori, Russian Empire',lat:41.99,lng:44.11},death:{label:'1953 · Moscow, Soviet Union',lat:55.75,lng:37.62},detail:'Born in Gori, Georgia (1878). Died in Moscow, Soviet Union (1953).',view:{lat:50,lng:43,zoom:4}},{name:'Franz Kafka',aliases:['franz kafka','kafka'],birth:{label:'1883 · Prague, Austria-Hungary',lat:50.08,lng:14.44},death:{label:'1924 · Kierling, Austria',lat:48.25,lng:16.24},detail:'Born in Prague, Bohemia (1883). Died in Kierling, Austria (1924).',view:{lat:49.5,lng:15.5,zoom:7}},{name:'Marie Curie',aliases:['marie curie','curie','maria sklodowska','marie sklodowska curie'],birth:{label:'1867 · Warsaw, Russian Empire',lat:52.23,lng:21.01},death:{label:'1934 · Passy, France',lat:45.86,lng:6.84},detail:'Born in Warsaw (1867). Died in Passy, France (1934).',view:{lat:49.5,lng:13.5,zoom:5}},{name:'Mahatma Gandhi',aliases:['mahatma gandhi','gandhi','mohandas gandhi'],birth:{label:'1869 · Porbandar, British India',lat:21.63,lng:69.61},death:{label:'1948 · Delhi, India',lat:28.64,lng:77.22},detail:'Born in Porbandar, British India (1869). Assassinated in Delhi (1948).',view:{lat:24.5,lng:74,zoom:5}},{name:'Che Guevara',aliases:['che guevara','guevara','ernesto guevara'],birth:{label:'1928 · Rosario, Argentina',lat:-32.95,lng:-60.66},death:{label:'1967 · La Higuera, Bolivia',lat:-18.59,lng:-64.24},detail:'Born in Rosario, Argentina (1928). Killed in La Higuera, Bolivia (1967).',view:{lat:-26,lng:-63,zoom:5}}];
+const map=L.map('map',{zoomControl:true,attributionControl:true});
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png',{attribution:'&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',subdomains:'abcd',maxZoom:19}).addTo(map);
+let deck=[],idx=0,score=0,answered=false,birthMarker,deathMarker,routeLine;const birthIcon=L.divIcon({className:'',html:'<div style="width:12px;height:12px;border-radius:50%;background:#0c5f66;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35)"></div>',iconSize:[12,12],iconAnchor:[6,6]}),deathIcon=L.divIcon({className:'',html:'<div style="width:12px;height:12px;border-radius:50%;background:#8a2450;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35)"></div>',iconSize:[12,12],iconAnchor:[6,6]});
+function norm(s){return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim()}
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function clearMap(){if(birthMarker) map.removeLayer(birthMarker);if(deathMarker) map.removeLayer(deathMarker);if(routeLine) map.removeLayer(routeLine)}
+function renderRound(){const f=deck[idx];answered=false;guessInput.value='';guessInput.disabled=false;statusMsg.className='';statusMsg.textContent='Enter a name and check the answer.';revealBox.style.display='none';roundNum.textContent=Math.min(idx+1,deck.length);scoreNum.textContent=score;clearMap();birthMarker=L.marker([f.birth.lat,f.birth.lng],{icon:birthIcon}).bindTooltip(f.birth.label,{permanent:true,direction:'top',className:'map-tip',offset:[0,-4]}).addTo(map);deathMarker=L.marker([f.death.lat,f.death.lng],{icon:deathIcon}).bindTooltip(f.death.label,{permanent:true,direction:'top',className:'map-tip',offset:[0,-4]}).addTo(map);routeLine=L.polyline([[f.birth.lat,f.birth.lng],[f.death.lat,f.death.lng]],{color:'#0c5f66',weight:2,dashArray:'6 6',opacity:.8}).addTo(map);map.setView([f.view.lat,f.view.lng],f.view.zoom,{animate:true})}
+function checkAnswer(e){e.preventDefault();if(answered)return;const f=deck[idx];const g=norm(guessInput.value.trim());if(!g){statusMsg.className='bad';statusMsg.textContent='Type a name first.';return}answered=true;const ok=f.aliases.some(a=>norm(a)===g)||norm(f.name)===g;statusMsg.className=ok?'good':'bad';statusMsg.textContent=ok?'Correct.':`Incorrect. The answer was: ${f.name}`;if(ok)score++;revealName.textContent=f.name;revealDetail.textContent=f.detail;revealBox.style.display='block';scoreNum.textContent=score}
+function nextRound(){if(!answered){statusMsg.className='bad';statusMsg.textContent='Check the current round first.';return}idx++;if(idx>=deck.length){guessInput.disabled=true;statusMsg.className='good';statusMsg.textContent=`Finished! Final score: ${score}/${deck.length}.`;roundNum.textContent=deck.length;return}renderRound()}
+function restart(){deck=shuffle(figures);idx=0;score=0;renderRound()}
+form.addEventListener('submit',checkAnswer);nextBtn.addEventListener('click',nextRound);restartBtn.addEventListener('click',restart);restart();
+</script>
+</body>
+</html>
