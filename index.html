@@ -50,10 +50,16 @@
       overflow: visible;
     }
 
-    .corner-link {
+    .corner-links {
       position: absolute;
       top: 0;
       right: -14rem;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .corner-link {
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -424,9 +430,11 @@
         padding-top: 56px;
       }
 
-      .corner-link {
-        top: 0;
-        right: 0;
+      .corner-links {
+        position: static;
+        flex-direction: row;
+        flex-wrap: wrap;
+        margin-bottom: var(--space-4);
       }
     }
 
@@ -438,9 +446,11 @@
         align-items: flex-start;
       }
 
+      .corner-links {
+        flex-direction: column;
+      }
+
       .corner-link {
-        position: static;
-        margin-bottom: var(--space-4);
         width: 100%;
       }
 
@@ -463,7 +473,11 @@
 </head>
 <body>
   <div class="app-shell">
-    <a href="russian-fates.html" class="corner-link">Russian Fates Trivia</a>
+
+    <div class="corner-links">
+      <a href="russian-fates.html" class="corner-link">Russian Fates Trivia</a>
+      <a href="map-quiz-leaflet-colored.html" class="corner-link">Map Trivia Quiz</a>
+    </div>
 
     <main class="app">
       <div class="top">
@@ -655,18 +669,13 @@
 
     async function fetchLeaderboard() {
       const url = `${SUPABASE_URL}/rest/v1/leaderboard?select=player,score,created_at,game&game=eq.${encodeURIComponent(GAME_NAME)}&order=score.desc,created_at.asc&limit=${MAX_LEADERBOARD_ENTRIES}`;
-
       const response = await fetch(url, {
         headers: {
           apikey: SUPABASE_ANON_KEY,
           Authorization: `Bearer ${SUPABASE_ANON_KEY}`
         }
       });
-
-      if (!response.ok) {
-        throw new Error('Could not load leaderboard.');
-      }
-
+      if (!response.ok) throw new Error('Could not load leaderboard.');
       return response.json();
     }
 
@@ -679,13 +688,8 @@
           Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
           Prefer: 'return=minimal'
         },
-        body: JSON.stringify({
-          player: name,
-          score,
-          game: GAME_NAME
-        })
+        body: JSON.stringify({ player: name, score, game: GAME_NAME })
       });
-
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(errorText || 'Could not save score.');
@@ -694,27 +698,22 @@
 
     async function renderLeaderboard() {
       leaderboardList.innerHTML = '<div class="hall-empty">Loading global leaderboard...</div>';
-
       try {
         const entries = await fetchLeaderboard();
-
         if (!entries.length) {
           leaderboardList.innerHTML = '<div class="hall-empty">No record holders yet. Set the first streak.</div>';
           return;
         }
-
-        leaderboardList.innerHTML = entries
-          .map((entry, index) => {
-            const topClass = index === 0 ? 'top-1' : index === 1 ? 'top-2' : index === 2 ? 'top-3' : '';
-            return `
-              <div class="hall-row ${topClass}">
-                <div class="hall-rank">#${index + 1}</div>
-                <div class="hall-name">${escapeHtml(entry.player)}</div>
-                <div class="hall-score">${entry.score}</div>
-              </div>
-            `;
-          })
-          .join('');
+        leaderboardList.innerHTML = entries.map((entry, index) => {
+          const topClass = index === 0 ? 'top-1' : index === 1 ? 'top-2' : index === 2 ? 'top-3' : '';
+          return `
+            <div class="hall-row ${topClass}">
+              <div class="hall-rank">#${index + 1}</div>
+              <div class="hall-name">${escapeHtml(entry.player)}</div>
+              <div class="hall-score">${entry.score}</div>
+            </div>
+          `;
+        }).join('');
       } catch (error) {
         leaderboardList.innerHTML = '<div class="hall-empty">Leaderboard unavailable right now.</div>';
       }
@@ -723,7 +722,6 @@
     async function addLeaderboardEntry(name, score) {
       const cleanName = name.trim().slice(0, 20);
       if (!cleanName || score <= 0) return;
-
       await insertLeaderboardEntry(cleanName, score);
       await renderLeaderboard();
     }
@@ -738,7 +736,6 @@
         state.deck = newDeck;
         state.index = 0;
       }
-
       const item = currentCountry();
       state.lastShownName = item.name;
       state.answered = false;
@@ -746,12 +743,10 @@
       countryFlag.src = item.flag;
       countryFlag.alt = `${item.name} flag`;
       statusText.textContent = 'Choose an answer';
-
       answerButtons.forEach(btn => {
         btn.disabled = false;
         btn.classList.remove('correct', 'wrong', 'dimmed');
       });
-
       updateScore();
     }
 
@@ -763,7 +758,6 @@
 
     function dismissWrongPopup() {
       popupOverlay.classList.add('hidden');
-
       if (state.pendingScore && state.pendingScore > 0) {
         openNameModal(state.pendingScore);
       } else {
@@ -787,12 +781,10 @@
 
     function chooseAnswer(choice) {
       if (state.answered) return;
-
       state.answered = true;
       const item = currentCountry();
       const correct = choice === item.answer;
       state.index += 1;
-
       answerButtons.forEach(btn => {
         btn.disabled = true;
         const value = btn.dataset.choice;
@@ -800,7 +792,6 @@
         else if (value === choice) btn.classList.add('wrong');
         else btn.classList.add('dimmed');
       });
-
       if (correct) {
         state.streak += 1;
         if (state.streak > state.bestStreak) state.bestStreak = state.streak;
@@ -824,10 +815,8 @@
       state.bestStreak = 0;
       state.lastShownName = null;
       state.pendingScore = null;
-
       popupOverlay.classList.add('hidden');
       nameOverlay.classList.add('hidden');
-
       updateScore();
       renderQuestion();
     }
@@ -835,26 +824,17 @@
     answerButtons.forEach(btn =>
       btn.addEventListener('click', () => chooseAnswer(btn.dataset.choice))
     );
-
     popupOkBtn.addEventListener('click', dismissWrongPopup);
-
     popupOverlay.addEventListener('click', e => {
       if (e.target === popupOverlay) dismissWrongPopup();
     });
-
     nameForm.addEventListener('submit', async e => {
       e.preventDefault();
       const name = playerNameInput.value.trim();
-
-      if (!name) {
-        playerNameInput.focus();
-        return;
-      }
-
+      if (!name) { playerNameInput.focus(); return; }
       const saveButton = nameForm.querySelector('.name-btn');
       saveButton.disabled = true;
       saveButton.textContent = 'Saving...';
-
       try {
         await addLeaderboardEntry(name, state.pendingScore || 0);
         closeNameModal();
@@ -865,10 +845,8 @@
         saveButton.textContent = 'Save score';
       }
     });
-
     skipSaveBtn.addEventListener('click', closeNameModal);
     restartBtn.addEventListener('click', restartGame);
-
     renderLeaderboard();
     restartGame();
   </script>
