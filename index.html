@@ -44,23 +44,30 @@
     button, input { font: inherit; }
     button { cursor: pointer; border: none; }
 
-    .app-shell {
-      position: relative;
-      width: min(100%, 720px);
-      overflow: visible;
+    /* Outer wrapper that gives room for the sidebar */
+    .page-wrapper {
+      display: grid;
+      grid-template-columns: minmax(0, 720px) 200px;
+      gap: var(--space-4);
+      align-items: start;
+      width: 100%;
+      max-width: 960px;
     }
 
-    .corner-links {
-      position: absolute;
-      top: 0;
-      right: -14rem;
+    .app-shell {
+      width: 100%;
+    }
+
+    /* Sidebar */
+    .sidebar {
       display: flex;
       flex-direction: column;
       gap: var(--space-3);
+      padding-top: 0;
     }
 
-    .corner-link {
-      display: inline-flex;
+    .sidebar-link {
+      display: flex;
       align-items: center;
       justify-content: center;
       min-height: 46px;
@@ -75,10 +82,11 @@
       text-decoration: none;
       white-space: nowrap;
       backdrop-filter: blur(10px);
+      text-align: center;
       transition: transform 160ms ease, background 160ms ease, box-shadow 160ms ease;
     }
 
-    .corner-link:hover {
+    .sidebar-link:hover {
       background: rgba(255,255,255,0.34);
       transform: translateY(-2px);
       box-shadow: 0 14px 32px rgba(0,0,0,0.24);
@@ -102,16 +110,8 @@
       margin-bottom: var(--space-6);
     }
 
-    h1 {
-      font-size: var(--text-lg);
-      font-weight: 700;
-      letter-spacing: -0.03em;
-    }
-
-    .score {
-      font-size: var(--text-sm);
-      color: var(--muted);
-    }
+    h1 { font-size: var(--text-lg); font-weight: 700; letter-spacing: -0.03em; }
+    .score { font-size: var(--text-sm); color: var(--muted); }
 
     .flag-box {
       width: 100%;
@@ -131,22 +131,9 @@
       box-shadow: 0 12px 30px rgba(0,0,0,0.22);
     }
 
-    .country {
-      text-align: center;
-      margin-bottom: var(--space-5);
-    }
-
-    .country-name {
-      font-size: var(--text-xl);
-      font-weight: 700;
-      letter-spacing: -0.04em;
-      margin-bottom: var(--space-2);
-    }
-
-    .question {
-      color: var(--muted);
-      font-size: var(--text-sm);
-    }
+    .country { text-align: center; margin-bottom: var(--space-5); }
+    .country-name { font-size: var(--text-xl); font-weight: 700; letter-spacing: -0.04em; margin-bottom: var(--space-2); }
+    .question { color: var(--muted); font-size: var(--text-sm); }
 
     .answers {
       display: grid;
@@ -208,37 +195,11 @@
       box-shadow: 0 10px 26px rgba(10, 15, 35, 0.12);
     }
 
-    .hall-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: var(--space-3);
-      margin-bottom: var(--space-4);
-    }
-
-    .hall-title {
-      font-size: 1rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-    }
-
-    .hall-note {
-      font-size: 0.8rem;
-      color: var(--muted);
-      white-space: nowrap;
-    }
-
-    .hall-list {
-      display: grid;
-      gap: var(--space-2);
-    }
-
-    .hall-empty {
-      text-align: center;
-      color: var(--muted);
-      font-size: var(--text-sm);
-      padding: var(--space-4) var(--space-2);
-    }
+    .hall-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-4); }
+    .hall-title { font-size: 1rem; font-weight: 700; letter-spacing: -0.02em; }
+    .hall-note { font-size: 0.8rem; color: var(--muted); white-space: nowrap; }
+    .hall-list { display: grid; gap: var(--space-2); }
+    .hall-empty { text-align: center; color: var(--muted); font-size: var(--text-sm); padding: var(--space-4) var(--space-2); }
 
     .hall-row {
       display: grid;
@@ -252,47 +213,13 @@
       border: 1px solid rgba(255,255,255,0.1);
     }
 
-    .hall-row.top-1 {
-      background: rgba(255, 214, 102, 0.16);
-      border-color: rgba(255, 214, 102, 0.24);
-    }
+    .hall-row.top-1 { background: rgba(255, 214, 102, 0.16); border-color: rgba(255, 214, 102, 0.24); }
+    .hall-row.top-2 { background: rgba(220, 226, 235, 0.12); border-color: rgba(220, 226, 235, 0.2); }
+    .hall-row.top-3 { background: rgba(205, 127, 80, 0.14); border-color: rgba(205, 127, 80, 0.22); }
 
-    .hall-row.top-2 {
-      background: rgba(220, 226, 235, 0.12);
-      border-color: rgba(220, 226, 235, 0.2);
-    }
-
-    .hall-row.top-3 {
-      background: rgba(205, 127, 80, 0.14);
-      border-color: rgba(205, 127, 80, 0.22);
-    }
-
-    .hall-rank {
-      width: 34px;
-      height: 34px;
-      display: grid;
-      place-items: center;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.14);
-      font-size: 0.84rem;
-      font-weight: 700;
-      color: rgba(255,255,255,0.96);
-    }
-
-    .hall-name {
-      min-width: 0;
-      font-size: 0.96rem;
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .hall-score {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: rgba(255,255,255,0.96);
-    }
+    .hall-rank { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 999px; background: rgba(255,255,255,0.14); font-size: 0.84rem; font-weight: 700; color: rgba(255,255,255,0.96); }
+    .hall-name { min-width: 0; font-size: 0.96rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .hall-score { font-size: 0.95rem; font-weight: 700; color: rgba(255,255,255,0.96); }
 
     .hidden { display: none; }
 
@@ -311,10 +238,7 @@
     .popup-overlay.hidden,
     .name-overlay.hidden { display: none; }
 
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
     .popup-card,
     .name-card {
@@ -326,46 +250,16 @@
       animation: popIn 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    .popup-card {
-      background: rgba(180, 20, 40, 0.92);
-      border: 1px solid rgba(255, 120, 120, 0.4);
-      padding: clamp(var(--space-5), 5vw, var(--space-8));
-    }
+    .popup-card { background: rgba(180, 20, 40, 0.92); border: 1px solid rgba(255, 120, 120, 0.4); padding: clamp(var(--space-5), 5vw, var(--space-8)); }
+    .name-card { background: rgba(38, 45, 92, 0.92); border: 1px solid rgba(255,255,255,0.18); padding: clamp(var(--space-5), 5vw, var(--space-8)); }
 
-    .name-card {
-      background: rgba(38, 45, 92, 0.92);
-      border: 1px solid rgba(255,255,255,0.18);
-      padding: clamp(var(--space-5), 5vw, var(--space-8));
-    }
+    @keyframes popIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-    @keyframes popIn {
-      from { transform: scale(0.85); opacity: 0; }
-      to   { transform: scale(1); opacity: 1; }
-    }
+    .popup-icon { font-size: 2.2rem; margin-bottom: var(--space-3); }
+    .popup-title, .name-title { font-size: var(--text-lg); font-weight: 700; margin-bottom: var(--space-3); }
+    .popup-body, .name-body { font-size: var(--text-sm); color: rgba(255,255,255,0.88); line-height: 1.5; margin-bottom: var(--space-5); }
 
-    .popup-icon {
-      font-size: 2.2rem;
-      margin-bottom: var(--space-3);
-    }
-
-    .popup-title,
-    .name-title {
-      font-size: var(--text-lg);
-      font-weight: 700;
-      margin-bottom: var(--space-3);
-    }
-
-    .popup-body,
-    .name-body {
-      font-size: var(--text-sm);
-      color: rgba(255,255,255,0.88);
-      line-height: 1.5;
-      margin-bottom: var(--space-5);
-    }
-
-    .popup-btn,
-    .name-btn,
-    .name-skip-btn {
+    .popup-btn, .name-btn, .name-skip-btn {
       min-height: 44px;
       padding: 0 var(--space-6);
       border-radius: 999px;
@@ -374,145 +268,84 @@
       border: 1px solid rgba(255,255,255,0.26);
     }
 
-    .popup-btn,
-    .name-btn {
-      background: rgba(255,255,255,0.22);
-    }
+    .popup-btn, .name-btn { background: rgba(255,255,255,0.22); }
+    .popup-btn:hover, .name-btn:hover { background: rgba(255,255,255,0.32); }
 
-    .popup-btn:hover,
-    .name-btn:hover {
-      background: rgba(255,255,255,0.32);
-    }
+    .name-form { display: grid; gap: var(--space-3); }
+    .name-input { width: 100%; min-height: 48px; border-radius: 0.9rem; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.12); color: var(--text); padding: 0 1rem; outline: none; }
+    .name-input::placeholder { color: rgba(255,255,255,0.62); }
+    .name-input:focus { border-color: rgba(255,255,255,0.45); background: rgba(255,255,255,0.18); }
+    .name-actions { display: flex; gap: var(--space-3); justify-content: center; flex-wrap: wrap; }
+    .name-skip-btn { background: rgba(255,255,255,0.1); }
+    .name-skip-btn:hover { background: rgba(255,255,255,0.18); }
 
-    .name-form {
-      display: grid;
-      gap: var(--space-3);
-    }
-
-    .name-input {
-      width: 100%;
-      min-height: 48px;
-      border-radius: 0.9rem;
-      border: 1px solid rgba(255,255,255,0.2);
-      background: rgba(255,255,255,0.12);
-      color: var(--text);
-      padding: 0 1rem;
-      outline: none;
-    }
-
-    .name-input::placeholder {
-      color: rgba(255,255,255,0.62);
-    }
-
-    .name-input:focus {
-      border-color: rgba(255,255,255,0.45);
-      background: rgba(255,255,255,0.18);
-    }
-
-    .name-actions {
-      display: flex;
-      gap: var(--space-3);
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .name-skip-btn {
-      background: rgba(255,255,255,0.1);
-    }
-
-    .name-skip-btn:hover {
-      background: rgba(255,255,255,0.18);
-    }
-
-    @media (max-width: 1100px) {
-      .app-shell {
-        width: min(100%, 760px);
-        padding-top: 56px;
+    @media (max-width: 1000px) {
+      .page-wrapper {
+        grid-template-columns: 1fr;
       }
-
-      .corner-links {
-        position: static;
+      .sidebar {
         flex-direction: row;
         flex-wrap: wrap;
-        margin-bottom: var(--space-4);
       }
     }
 
     @media (max-width: 640px) {
       .answers { grid-template-columns: 1fr; }
-
-      .top {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .corner-links {
-        flex-direction: column;
-      }
-
-      .corner-link {
-        width: 100%;
-      }
-
-      .control-btn,
-      .name-btn,
-      .name-skip-btn {
-        width: 100%;
-      }
-
-      .hall-of-fame {
-        width: 100%;
-      }
-
-      .hall-head {
-        flex-direction: column;
-        align-items: flex-start;
-      }
+      .top { flex-direction: column; align-items: flex-start; }
+      .sidebar { flex-direction: column; }
+      .sidebar-link, .control-btn, .name-btn, .name-skip-btn { width: 100%; }
+      .hall-of-fame { width: 100%; }
+      .hall-head { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
 <body>
-  <div class="app-shell">
 
-    <div class="corner-links">
-      <a href="russian-fates.html" class="corner-link">Russian Fates Trivia</a>
-      <a href="map-quiz-leaflet-colored.html" class="corner-link">Map Trivia Quiz</a>
+  <div class="page-wrapper">
+
+    <div class="app-shell">
+      <main class="app">
+        <div class="top">
+          <h1>British or French?</h1>
+          <div class="score" id="scoreLine">Streak: 0 | Best: 0</div>
+        </div>
+
+        <div class="flag-box">
+          <img id="countryFlag" src="" alt="Country flag" width="420" height="315" loading="eager" decoding="async" />
+        </div>
+
+        <section class="country">
+          <div class="country-name" id="countryName">Country</div>
+          <div class="question">Was it a British colony or a French colony?</div>
+        </section>
+
+        <section class="answers" aria-label="Answer choices">
+          <button class="answer-btn" data-choice="British">British Colony</button>
+          <button class="answer-btn" data-choice="French">French Colony</button>
+        </section>
+
+        <div class="status" id="statusText">Choose an answer.</div>
+
+        <div class="controls">
+          <button class="control-btn" id="restartBtn">Restart</button>
+        </div>
+
+        <section class="hall-of-fame" aria-labelledby="hallTitle">
+          <div class="hall-head">
+            <div class="hall-title" id="hallTitle">Hall of Fame</div>
+            <div class="hall-note">Global best streaks</div>
+          </div>
+          <div class="hall-list" id="leaderboardList"></div>
+        </section>
+      </main>
     </div>
 
-    <main class="app">
-      <div class="top">
-        <h1>British or French?</h1>
-        <div class="score" id="scoreLine">Streak: 0 | Best: 0</div>
-      </div>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <a href="russian-fates.html" class="sidebar-link">Russian Fates Trivia</a>
+      <a href="map-quiz-leaflet-colored.html" class="sidebar-link">Map Trivia Quiz</a>
+    </aside>
 
-      <div class="flag-box">
-        <img id="countryFlag" src="" alt="Country flag" width="420" height="315" loading="eager" decoding="async" />
-      </div>
-
-      <section class="country">
-        <div class="country-name" id="countryName">Country</div>
-        <div class="question">Was it a British colony or a French colony?</div>
-      </section>
-
-      <section class="answers" aria-label="Answer choices">
-        <button class="answer-btn" data-choice="British">British Colony</button>
-        <button class="answer-btn" data-choice="French">French Colony</button>
-      </section>
-
-      <div class="status" id="statusText">Choose an answer.</div>
-
-      <div class="controls">
-        <button class="control-btn" id="restartBtn">Restart</button>
-      </div>
-
-      <section class="hall-of-fame" aria-labelledby="hallTitle">
-        <div class="hall-head">
-          <div class="hall-title" id="hallTitle">Hall of Fame</div>
-          <div class="hall-note">Global best streaks</div>
-        </div>
-        <div class="hall-list" id="leaderboardList"></div>
-      </section>
-    </main>
   </div>
 
   <div class="popup-overlay hidden" id="popupOverlay" role="dialog" aria-modal="true" aria-labelledby="popupTitle">
@@ -650,31 +483,18 @@
       return copy;
     }
 
-    function currentCountry() {
-      return state.deck[state.index];
-    }
-
-    function updateScore() {
-      scoreLine.textContent = `Streak: ${state.streak} | Best: ${state.bestStreak}`;
-    }
+    function currentCountry() { return state.deck[state.index]; }
+    function updateScore() { scoreLine.textContent = `Streak: ${state.streak} | Best: ${state.bestStreak}`; }
 
     function escapeHtml(value) {
       return value
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#39;');
+        .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
     }
 
     async function fetchLeaderboard() {
       const url = `${SUPABASE_URL}/rest/v1/leaderboard?select=player,score,created_at,game&game=eq.${encodeURIComponent(GAME_NAME)}&order=score.desc,created_at.asc&limit=${MAX_LEADERBOARD_ENTRIES}`;
-      const response = await fetch(url, {
-        headers: {
-          apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${SUPABASE_ANON_KEY}`
-        }
-      });
+      const response = await fetch(url, { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } });
       if (!response.ok) throw new Error('Could not load leaderboard.');
       return response.json();
     }
@@ -682,37 +502,20 @@
     async function insertLeaderboardEntry(name, score) {
       const response = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-          Prefer: 'return=minimal'
-        },
+        headers: { 'Content-Type': 'application/json', apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, Prefer: 'return=minimal' },
         body: JSON.stringify({ player: name, score, game: GAME_NAME })
       });
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || 'Could not save score.');
-      }
+      if (!response.ok) throw new Error(await response.text() || 'Could not save score.');
     }
 
     async function renderLeaderboard() {
       leaderboardList.innerHTML = '<div class="hall-empty">Loading global leaderboard...</div>';
       try {
         const entries = await fetchLeaderboard();
-        if (!entries.length) {
-          leaderboardList.innerHTML = '<div class="hall-empty">No record holders yet. Set the first streak.</div>';
-          return;
-        }
+        if (!entries.length) { leaderboardList.innerHTML = '<div class="hall-empty">No record holders yet. Set the first streak.</div>'; return; }
         leaderboardList.innerHTML = entries.map((entry, index) => {
           const topClass = index === 0 ? 'top-1' : index === 1 ? 'top-2' : index === 2 ? 'top-3' : '';
-          return `
-            <div class="hall-row ${topClass}">
-              <div class="hall-rank">#${index + 1}</div>
-              <div class="hall-name">${escapeHtml(entry.player)}</div>
-              <div class="hall-score">${entry.score}</div>
-            </div>
-          `;
+          return `<div class="hall-row ${topClass}"><div class="hall-rank">#${index + 1}</div><div class="hall-name">${escapeHtml(entry.player)}</div><div class="hall-score">${entry.score}</div></div>`;
         }).join('');
       } catch (error) {
         leaderboardList.innerHTML = '<div class="hall-empty">Leaderboard unavailable right now.</div>';
@@ -733,58 +536,39 @@
           const swapIdx = 1 + Math.floor(Math.random() * (newDeck.length - 1));
           [newDeck[0], newDeck[swapIdx]] = [newDeck[swapIdx], newDeck[0]];
         }
-        state.deck = newDeck;
-        state.index = 0;
+        state.deck = newDeck; state.index = 0;
       }
       const item = currentCountry();
-      state.lastShownName = item.name;
-      state.answered = false;
-      countryName.textContent = item.name;
-      countryFlag.src = item.flag;
-      countryFlag.alt = `${item.name} flag`;
+      state.lastShownName = item.name; state.answered = false;
+      countryName.textContent = item.name; countryFlag.src = item.flag; countryFlag.alt = `${item.name} flag`;
       statusText.textContent = 'Choose an answer';
-      answerButtons.forEach(btn => {
-        btn.disabled = false;
-        btn.classList.remove('correct', 'wrong', 'dimmed');
-      });
+      answerButtons.forEach(btn => { btn.disabled = false; btn.classList.remove('correct', 'wrong', 'dimmed'); });
       updateScore();
     }
 
     function showWrongPopup(item, endedStreak) {
       popupBody.textContent = `${item.name} was a ${item.answer} colony. Your streak was ${endedStreak}.`;
-      popupOverlay.classList.remove('hidden');
-      popupOkBtn.focus();
+      popupOverlay.classList.remove('hidden'); popupOkBtn.focus();
     }
 
     function dismissWrongPopup() {
       popupOverlay.classList.add('hidden');
-      if (state.pendingScore && state.pendingScore > 0) {
-        openNameModal(state.pendingScore);
-      } else {
-        renderQuestion();
-      }
+      if (state.pendingScore && state.pendingScore > 0) openNameModal(state.pendingScore);
+      else renderQuestion();
     }
 
     function openNameModal(score) {
       state.pendingScore = score;
       nameBody.textContent = `Wrong! Your streak was ${score}. Enter your name to claim a place in the Hall of Fame.`;
-      playerNameInput.value = '';
-      nameOverlay.classList.remove('hidden');
-      playerNameInput.focus();
+      playerNameInput.value = ''; nameOverlay.classList.remove('hidden'); playerNameInput.focus();
     }
 
-    function closeNameModal() {
-      nameOverlay.classList.add('hidden');
-      state.pendingScore = null;
-      renderQuestion();
-    }
+    function closeNameModal() { nameOverlay.classList.add('hidden'); state.pendingScore = null; renderQuestion(); }
 
     function chooseAnswer(choice) {
       if (state.answered) return;
       state.answered = true;
-      const item = currentCountry();
-      const correct = choice === item.answer;
-      state.index += 1;
+      const item = currentCountry(); const correct = choice === item.answer; state.index += 1;
       answerButtons.forEach(btn => {
         btn.disabled = true;
         const value = btn.dataset.choice;
@@ -793,57 +577,32 @@
         else btn.classList.add('dimmed');
       });
       if (correct) {
-        state.streak += 1;
-        if (state.streak > state.bestStreak) state.bestStreak = state.streak;
-        statusText.textContent = `Correct! Streak: ${state.streak}`;
-        updateScore();
-        setTimeout(renderQuestion, 900);
+        state.streak += 1; if (state.streak > state.bestStreak) state.bestStreak = state.streak;
+        statusText.textContent = `Correct! Streak: ${state.streak}`; updateScore(); setTimeout(renderQuestion, 900);
       } else {
-        const ended = state.streak;
-        state.streak = 0;
-        updateScore();
-        state.pendingScore = ended;
-        showWrongPopup(item, ended);
+        const ended = state.streak; state.streak = 0; updateScore(); state.pendingScore = ended; showWrongPopup(item, ended);
       }
     }
 
     function restartGame() {
-      state.deck = shuffle(countries);
-      state.index = 0;
-      state.answered = false;
-      state.streak = 0;
-      state.bestStreak = 0;
-      state.lastShownName = null;
-      state.pendingScore = null;
-      popupOverlay.classList.add('hidden');
-      nameOverlay.classList.add('hidden');
-      updateScore();
-      renderQuestion();
+      state.deck = shuffle(countries); state.index = 0; state.answered = false;
+      state.streak = 0; state.bestStreak = 0; state.lastShownName = null; state.pendingScore = null;
+      popupOverlay.classList.add('hidden'); nameOverlay.classList.add('hidden');
+      updateScore(); renderQuestion();
     }
 
-    answerButtons.forEach(btn =>
-      btn.addEventListener('click', () => chooseAnswer(btn.dataset.choice))
-    );
+    answerButtons.forEach(btn => btn.addEventListener('click', () => chooseAnswer(btn.dataset.choice)));
     popupOkBtn.addEventListener('click', dismissWrongPopup);
-    popupOverlay.addEventListener('click', e => {
-      if (e.target === popupOverlay) dismissWrongPopup();
-    });
+    popupOverlay.addEventListener('click', e => { if (e.target === popupOverlay) dismissWrongPopup(); });
     nameForm.addEventListener('submit', async e => {
       e.preventDefault();
       const name = playerNameInput.value.trim();
       if (!name) { playerNameInput.focus(); return; }
       const saveButton = nameForm.querySelector('.name-btn');
-      saveButton.disabled = true;
-      saveButton.textContent = 'Saving...';
-      try {
-        await addLeaderboardEntry(name, state.pendingScore || 0);
-        closeNameModal();
-      } catch (error) {
-        nameBody.textContent = 'Could not save score right now. Check your Supabase URL, key, table, and policies.';
-      } finally {
-        saveButton.disabled = false;
-        saveButton.textContent = 'Save score';
-      }
+      saveButton.disabled = true; saveButton.textContent = 'Saving...';
+      try { await addLeaderboardEntry(name, state.pendingScore || 0); closeNameModal(); }
+      catch (error) { nameBody.textContent = 'Could not save score right now. Check your Supabase URL, key, table, and policies.'; }
+      finally { saveButton.disabled = false; saveButton.textContent = 'Save score'; }
     });
     skipSaveBtn.addEventListener('click', closeNameModal);
     restartBtn.addEventListener('click', restartGame);
